@@ -1,5 +1,5 @@
 import { it, expect } from "vitest";
-import { PDFDocument, rgb } from "pdf-lib";
+import { PDFDocument, rgb, degrees } from "pdf-lib";
 import sharp from "sharp";
 import { defaultConfig } from "../lib/catalog";
 import {
@@ -117,4 +117,45 @@ it("renders embedded SVG text with bundled fonts and keeps converted pixels thro
     .toBuffer();
   expect(pixel[0]).toBeGreaterThan(245);
   expect(pixel[1]).toBeLessThan(10);
+}, 15000);
+
+it("honours PDF trim boxes and page rotation instead of shrinking existing bleed into the printed design", async () => {
+  for (const rotation of [0, 90, 180, 270]) {
+    const doc = await PDFDocument.create(),
+      page = doc.addPage([220, 140]);
+    page.drawRectangle({
+      x: 0,
+      y: 0,
+      width: 220,
+      height: 140,
+      color: rgb(1, 0, 0),
+    });
+    page.drawRectangle({
+      x: 10,
+      y: 10,
+      width: 200,
+      height: 120,
+      color: rgb(0, 0, 1),
+    });
+    page.setTrimBox(10, 10, 200, 120);
+    page.setRotation(degrees(rotation));
+    const prepared = await prepareSource(
+      Buffer.from(await doc.save()),
+      "trim.pdf",
+      c,
+    );
+    const pixel = await sharp(
+      Buffer.from(prepared.image.split(",")[1], "base64"),
+    )
+      .extract({ left: 2, top: 2, width: 1, height: 1 })
+      .removeAlpha()
+      .raw()
+      .toBuffer();
+    expect(pixel[2]).toBeGreaterThan(245);
+    expect(pixel[0]).toBeLessThan(10);
+    expect(prepared.width / prepared.height).toBeCloseTo(
+      rotation % 180 === 0 ? 200 / 120 : 120 / 200,
+      1,
+    );
+  }
 }, 15000);

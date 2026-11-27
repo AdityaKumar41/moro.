@@ -15,6 +15,8 @@ const config: NextConfig = {
       "./node_modules/@hyzyla/pdfium/dist/**/*",
       "./node_modules/@resvg/**/*",
       "./node_modules/@xmldom/**/*",
+      "./node_modules/pdf-lib/**/*",
+      "./node_modules/@pdf-lib/**/*",
       "./node_modules/sharp/**/*",
       "./node_modules/@img/**/*",
     ],
