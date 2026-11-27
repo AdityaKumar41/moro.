@@ -18,7 +18,13 @@ export function SiteFrame({
     <AccountProvider>
       <div
         className={
-          workspace ? "moro-app" : isPublic ? "moro-public" : "moro-workspace"
+          workspace
+            ? "moro-app"
+            : auth
+              ? "moro-public moro-auth-frame"
+              : isPublic
+                ? "moro-public"
+                : "moro-workspace"
         }
         data-preview={sandbox}
       >
