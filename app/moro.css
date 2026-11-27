@@ -2362,3 +2362,7 @@
 .gallery-credit a { text-decoration: underline; text-underline-offset: 3px; }
 .gallery-note { max-width: 660px; color: #67665e; font-size: 13px; line-height: 1.7; margin: 48px 0 0; }
 @media (prefers-reduced-motion: reduce) { .gallery-grid .moro-product-art img { transition: none; } }
+@media (max-width: 640px) {
+  .gallery-grid { grid-template-columns: minmax(0, 1fr); gap: 36px; }
+  .gallery-grid .moro-product-art { height: auto; aspect-ratio: 4 / 3; }
+}
