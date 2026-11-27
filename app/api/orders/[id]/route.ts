@@ -1,3 +1,4 @@
+import { preflightPrintImages } from "@/lib/image-preflight";
 import { preflightPrintText } from "@/lib/print-preflight";
 import { after } from "next/server";
 import { drainQueue } from "@/lib/worker";
@@ -50,6 +51,7 @@ export async function POST(
       validateArtwork(b.artwork, o.configuration);
       try {
         preflightPrintText(b.artwork, o.configuration, o.variable_data);
+        await preflightPrintImages(b.artwork);
       } catch (e) {
         throw new HttpError(400, (e as Error).message);
       }

@@ -1,3 +1,4 @@
+import { preflightPrintImages } from "@/lib/image-preflight";
 import { orderSearch } from "@/lib/order-search";
 import { verifyPreparedSource } from "@/lib/source-artwork";
 import { saveDesignForOwner } from "@/lib/design-store";
@@ -134,6 +135,7 @@ export async function POST(req: Request) {
     if (existing) return NextResponse.json(existing);
     try {
       preflightPrintText(body.artwork, body.configuration, body.variableData);
+      await preflightPrintImages(body.artwork);
     } catch (e) {
       throw new HttpError(400, (e as Error).message);
     }

@@ -1,3 +1,5 @@
+import { verifyPreparedSource } from "@/lib/source-artwork";
+import { designSchema } from "@/lib/catalog";
 import { NextResponse } from "next/server";
 import { actor, checked, fail, HttpError, sameOrigin } from "@/lib/http";
 import { adminDb } from "@/lib/db";
@@ -25,14 +27,30 @@ export async function POST(
       (p: { id: string }) => p.id === o.approved_proof_id,
     );
     if (!proof) throw new HttpError(409, "Approved artwork unavailable");
+    const artwork = designSchema.parse(proof.artwork);
+    let sourcePath: string | undefined;
+    if (
+      o.upload_path &&
+      o.upload_path.startsWith(u.id + "/") &&
+      artwork.source &&
+      verifyPreparedSource(artwork, o.upload_path)
+    ) {
+      const original = await adminDb()
+        .storage.from("artwork")
+        .info(o.upload_path);
+      if (!original.error && original.data) sourcePath = o.upload_path;
+    }
+    // Approved pixels remain reusable even after a staff revision, key rotation
+    // or original-file removal. Never re-import an older, different source.
+    if (!sourcePath) delete artwork.source;
     return NextResponse.json({
       configuration: o.configuration,
-      artwork: proof.artwork,
+      artwork,
       resources: {
         version: 1,
         variableData: o.variable_data || [],
-        uploadPath: o.upload_path || undefined,
-        uploadName: o.upload_path ? "Original source artwork" : undefined,
+        uploadPath: sourcePath,
+        uploadName: sourcePath ? "Original source artwork" : undefined,
       },
     });
   } catch (e) {

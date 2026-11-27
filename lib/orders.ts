@@ -29,7 +29,7 @@ export const orderSchema = z
       )
       .max(500)
       .default([]),
-    uploadPath: z.string().max(300).optional(),
+    uploadPath: z.string().min(1).max(300).optional(),
   })
   .superRefine((v, ctx) => {
     if (!v.artwork.layers.some((l) => !l.hidden))
