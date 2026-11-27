@@ -32,7 +32,7 @@
     "@prisma/adapter-pg": "7.10.1",
     "@prisma/client": "7.10.1",
     "@resvg/resvg-js": "2.6.2",
-    "@supabase/ssr": "^0.8.0",
+    "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.86.0",
     "@xmldom/xmldom": "0.9.12",
     "csv-parse": "^7.0.3",
