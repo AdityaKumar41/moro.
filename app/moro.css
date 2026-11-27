@@ -2346,3 +2346,19 @@
   margin: 20px 0;
   color: #77786e;
 }
+
+/* Independent real-work gallery: photography, clear category routes and credits. */
+.gallery-count { margin: -8px 0 24px; color: #67665e; font-size: 13px; }
+.gallery-image-link { display: block; border-radius: 8px; }
+.gallery-image-link:focus-visible { outline: 3px solid #2b53b9; outline-offset: 5px; }
+.gallery-grid .moro-product-art { border-radius: 8px; }
+.gallery-grid .moro-product-art img { object-fit: cover; transition: transform .5s; }
+.gallery-image-link:hover img { transform: scale(1.035); }
+.gallery-image-link:hover .product-hover, .gallery-image-link:focus-visible .product-hover { opacity: 1; translate: 0; }
+.gallery-grid .moro-product-caption small { text-transform: uppercase; display: block; margin-bottom: 8px; }
+.gallery-credit { margin-top: 16px; border-top: 1px solid #2222; padding-top: 12px; color: #67665e; font-size: 12px; line-height: 1.6; }
+.gallery-credit summary { cursor: pointer; width: fit-content; }
+.gallery-credit p { margin: 8px 0 0; }
+.gallery-credit a { text-decoration: underline; text-underline-offset: 3px; }
+.gallery-note { max-width: 660px; color: #67665e; font-size: 13px; line-height: 1.7; margin: 48px 0 0; }
+@media (prefers-reduced-motion: reduce) { .gallery-grid .moro-product-art img { transition: none; } }
