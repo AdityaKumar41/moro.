@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { NextResponse } from "next/server";
 import { actor, fail, limit, sameOrigin } from "@/lib/http";
-import { drainQueue } from "@/lib/worker";
+import { drainQueue, workOnce } from "@/lib/worker";
 import { timingSafeEqual } from "node:crypto";
 export const maxDuration = 300;
 export async function POST(req: Request) {
@@ -28,7 +28,11 @@ export async function GET(req: Request) {
     const target = new URL(req.url).searchParams.get("order");
     const orderId = target === null ? undefined : z.uuid().parse(target);
     return NextResponse.json({
-      batches: await drainQueue(45000, orderId),
+      batches: orderId
+        ? (await workOnce(5, orderId))
+          ? 1
+          : 0
+        : await drainQueue(),
       orderId: orderId ?? null,
     });
   } catch (e) {
