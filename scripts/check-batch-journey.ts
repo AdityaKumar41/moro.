@@ -196,7 +196,7 @@ async function main() {
     );
     await db.from("notifications").delete().eq("order_id", id);
     async function run(kind: string) {
-      for (let attempt = 0; attempt < 25; attempt++) {
+      for (let attempt = 0; attempt < 150; attempt++) {
         const result = await db
           .from("jobs")
           .select("state,completed_rows,last_error")
