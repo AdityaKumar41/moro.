@@ -4,7 +4,7 @@
 
 Node 22 and 24 run `npm ci`, `npm run db:validate`, `npm run typecheck`, `npm test`, `npm run build`, `npm run check:public` and `npm run check:release`. The workflow has read-only repository access and no application credentials. Dependency audit and CodeQL run separately. No test charges cards, sends customer email or contacts the deployed service.
 
-Vitest covers pricing/GST/volume thresholds, print geometry/fonts, six product families, a 500-row distinct-output render regression, CSV substitution, PDF/PNG output, payment modes, webhook/approval rules, PGlite migrations/RLS, studio commands/history/resources, request feedback, receipt attachments/transports and auth callback origin/return validation. Database tests use synthetic local identities. The public smoke check starts a built Next server with production secrets removed, checks routes, quotes, security headers and disabled service boundaries, and shuts it down.
+Vitest covers pricing/GST/volume thresholds, print geometry/fonts, six product families, a 500-row distinct-output render regression, CSV substitution, PDF/PNG output, payment modes, webhook/approval rules, PGlite migrations/RLS, studio commands/history/resources, request feedback, receipt attachments/transports and auth callback origin/return validation. Database tests use synthetic local identities. The public smoke check starts a built Next server with production secrets removed, checks routes, quotes, security headers, the guest account status required for studio hydration and disabled service boundaries, and shuts it down.
 
 ## Isolated real-service acceptance
 

@@ -2,9 +2,16 @@ import { prismaConfigured, withPrismaSession } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { actor, checked, fail, jsonBody, sameOrigin } from "@/lib/http";
-import { adminDb } from "@/lib/db";
+import { adminDb, configured } from "@/lib/db";
 export async function GET() {
   try {
+    // No identity backend means no signed-in account. Keep the public editor
+    // available as a guest; configured service failures still reach fail().
+    if (!configured())
+      return NextResponse.json(
+        { error: "Please sign in to continue" },
+        { status: 401 },
+      );
     const u = await actor();
     const data = prismaConfigured()
       ? await withPrismaSession(u.id, (db) =>

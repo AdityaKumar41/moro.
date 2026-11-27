@@ -96,6 +96,12 @@ try {
         ?.includes("frame-ancestors 'none'"),
     );
   }
+  // Guest studio hydration depends on this exact status, not just route HTML.
+  assert.equal(
+    (await get("/api/profile")).status,
+    401,
+    "Unconfigured identity must resolve as guest",
+  );
   const galleryHtml = await (await get("/work")).text();
   assert(galleryHtml.includes("Independent print inspiration"));
   assert(galleryHtml.includes("Photo &amp; licence"));
