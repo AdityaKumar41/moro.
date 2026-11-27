@@ -3,7 +3,7 @@ import https from "node:https";
 import http from "node:http";
 import { writeFile, mkdir } from "node:fs/promises";
 import { createServerClient } from "@supabase/ssr";
-import sharp from "sharp";
+import sharp, { type Metadata } from "sharp";
 import { PDFDocument } from "pdf-lib";
 import { integrationGuard } from "./integration-guard";
 import { adminDb } from "../lib/db";
@@ -331,7 +331,7 @@ async function main() {
         assert.ifError(f.error);
         const bytes: Buffer = Buffer.from(await f.data!.arrayBuffer());
         if (kind === "png") {
-          const m: sharp.Metadata = await sharp(bytes).metadata();
+          const m: Metadata = await sharp(bytes).metadata();
           assert.equal(
             m.width,
             Math.ceil(((c.width + 2 * bleed) / 25.4) * dpi),
