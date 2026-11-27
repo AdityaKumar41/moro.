@@ -162,6 +162,14 @@ export const layerSchema = z
       });
   });
 export const designSchema = z.object({
+  source: z
+    .object({
+      version: z.literal(1),
+      path: z.string().max(300),
+      imageHash: z.string().regex(/^[a-f0-9]{64}$/),
+      signature: z.string().regex(/^[a-f0-9]{64}$/),
+    })
+    .optional(),
   name: z.string().min(1).max(100),
   background: z.string().regex(/^#[0-9a-fA-F]{6}$/),
   layers: z.array(layerSchema).max(30),

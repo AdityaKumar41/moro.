@@ -1,8 +1,24 @@
 import type { NextConfig } from "next";
 const config: NextConfig = {
   poweredByHeader: false,
-  serverExternalPackages: ["sharp", "fontkit"],
-  outputFileTracingIncludes: { "/api/**": ["./assets/print-fonts/**/*"] },
+  serverExternalPackages: [
+    "sharp",
+    "fontkit",
+    "@hyzyla/pdfium",
+    "@resvg/resvg-js",
+    "@xmldom/xmldom",
+  ],
+  outputFileTracingIncludes: {
+    "/api/**": ["./assets/print-fonts/**/*"],
+    "/api/uploads/prepare": [
+      "./lib/source-render.worker.mjs",
+      "./node_modules/@hyzyla/pdfium/dist/**/*",
+      "./node_modules/@resvg/**/*",
+      "./node_modules/@xmldom/**/*",
+      "./node_modules/sharp/**/*",
+      "./node_modules/@img/**/*",
+    ],
+  },
   async headers() {
     return [
       {

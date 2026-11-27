@@ -8,9 +8,13 @@ import { renderArtwork } from "./render";
 import { checked } from "./http";
 const hash = (bytes: Buffer) =>
   createHash("sha256").update(bytes).digest("hex");
-export async function workOnce(batchSize = 25) {
+export async function workOnce(batchSize = 25, orderId?: string) {
   const db = adminDb();
-  const { data: jobs } = checked(await db.rpc("claim_job"));
+  const { data: jobs } = checked(
+    orderId
+      ? await db.rpc("claim_order_job", { p_order: orderId })
+      : await db.rpc("claim_job"),
+  );
   const j = jobs?.[0];
   if (!j) return false;
   try {
@@ -195,10 +199,10 @@ export async function sendNotifications(notificationId?: string) {
   return sent;
 }
 
-export async function drainQueue(budgetMs = 45000) {
+export async function drainQueue(budgetMs = 45000, orderId?: string) {
   const deadline = Date.now() + budgetMs;
   let batches = 0;
-  while (Date.now() < deadline && (await workOnce(5))) batches++;
-  await sendNotifications();
+  while (Date.now() < deadline && (await workOnce(5, orderId))) batches++;
+  if (!orderId) await sendNotifications();
   return batches;
 }

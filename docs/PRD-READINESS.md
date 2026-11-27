@@ -6,12 +6,12 @@ Moro is a transactional web-to-print platform for India/INR/GST, with Stripe kep
 | --- | --- | --- |
 | Catalogue/pricing | Six parameter-driven families; materials/sizes/quantity, integer pricing, volume discounts and tax totals | Merchant-approved prices/tax/terms before real trading |
 | Designer | Templates, text/fonts/colour, images, move/resize/rotate, physical constraints, keyboard/inline editing, layers/history and cloud autosave | Wider touch/device/accessibility and maximum-document tests; advanced grouping/cropping is not claimed |
-| Saved projects | Owner-checked serialized save, save before exit/checkout, server order-to-design persistence, source/CSV resource recovery | Multi-tab/version-conflict acceptance and wider session-expiry cases |
+| Saved projects | Owner-checked serialized save, save before exit/checkout, server order-to-design persistence, source/CSV resource recovery and older-design pagination | Multi-tab/version-conflict acceptance and wider session-expiry cases |
 | Checkout | Hosted test Checkout, signature/ownership/amount reconciliation, replay protection, bounded feedback/retry | Region-appropriate fixtures and full hosted return/cancellation matrix for each deployment |
-| Proofs/production | Versioned previews, customer approval, revision invalidation, paid/current-proof production gates, per-row PDF/PNG | Actual source-file/operator/press/cutting/colour acceptance |
+| Proofs/production | Automatic PDF/AI/SVG/PNG source preparation, versioned previews, customer approval, revision invalidation, paid/current-proof production gates, per-row PDF/PNG | Physical press/cutting/colour acceptance |
 | Accounts | Email confirmation/password recovery, Google PKCE, profile, history, reorder and private receipts | Wider production/device/session-expiry matrix |
 | Email | Payment PDF attachment, requested receipt resend and bounded leased delivery | Branded domain/volume/bounce acceptance and operational alert ownership |
-| Staff tools | Product/template/user roles, job pipeline, current artifact downloads and reporting | Service health/failed-email recovery are implemented; individual staff MFA, broader security review and operating drills |
+| Staff tools | Product/template/user roles, job pipeline, database-wide archive filters, current artifact downloads and reporting | Service health/failed-email recovery are implemented; individual staff MFA, broader security review and operating drills |
 | UI | Shared Moro theme, focused studio, skeletons, feedback and responsive samples | Full device/screen-reader/200% zoom acceptance |
 | Operations | Restricted server APIs, RLS/private storage, leased jobs/outbox, dependency tests and CI | Load/capacity targets, alerts, retention and verified backup restoration |
 

@@ -746,7 +746,7 @@ export default function Studio() {
   async function upload(file?: File) {
     if (!file || operation.current || !requireAccount("upload")) return;
     operation.current = true;
-    setActivity("Uploading your source artwork…");
+    setActivity("Uploading and preparing your artwork…");
     setPending(true);
     try {
       if (file.size > 20971520) throw Error("Choose artwork up to 20 MB.");
@@ -772,11 +772,20 @@ export default function Studio() {
         body: file,
       });
       if (!uploaded.ok) throw Error("Artwork upload failed. Please try again.");
+      setActivity("Preparing your file for the canvas…");
+      const result = await api("/api/uploads/prepare", {
+        path: b.path,
+        name: file.name,
+        configuration,
+      });
+      const imported = designSchema.parse(result.artwork);
       remember();
+      setArtwork({ ...imported, name: artwork.name });
+      setSelected(imported.layers[0].id);
       setUploadPath(b.path);
       setUploadName(file.name);
       setMessage(
-        "Artwork attached. Our production team will preflight it and publish a proof before printing.",
+        "Artwork ready. Your file is on the canvas and will be used for your proof.",
       );
     } catch (e) {
       setMessage((e as Error).message);
@@ -1246,8 +1255,9 @@ export default function Studio() {
             <>
               <h2>Uploads & data</h2>
               <p className="editor-caption">
-                Add an image to your canvas, attach source artwork for
-                preflight, or personalise every piece with a CSV.
+                Import your finished artwork onto the canvas, add an image, or
+                personalise every piece with a CSV. PDF, PDF-compatible AI,
+                self-contained SVG and PNG are prepared automatically.
               </p>
               <button
                 className="button outline full"
@@ -1275,13 +1285,46 @@ export default function Studio() {
               </label>
               {uploadName && (
                 <p className="editor-caption">
-                  Attached: {uploadName}{" "}
+                  {artwork.source ? "Ready:" : "Attached:"} {uploadName}{" "}
+                  {!artwork.source && (
+                    <button
+                      className="text-link"
+                      disabled={pending}
+                      onClick={async () => {
+                        if (!uploadPath) return;
+                        setPending(true);
+                        setActivity("Preparing attached artwork…");
+                        try {
+                          const result = await api("/api/uploads/prepare", {
+                            path: uploadPath,
+                            name: uploadName,
+                            configuration,
+                          });
+                          const imported = designSchema.parse(result.artwork);
+                          remember();
+                          setArtwork({ ...imported, name: artwork.name });
+                          setSelected(imported.layers[0].id);
+                          setMessage(
+                            "Your source artwork is ready on the canvas.",
+                          );
+                        } catch (e) {
+                          setMessage((e as Error).message);
+                        } finally {
+                          setPending(false);
+                          setActivity("");
+                        }
+                      }}
+                    >
+                      Prepare artwork
+                    </button>
+                  )}
                   <button
                     className="text-link"
                     onClick={() => {
                       remember();
                       setUploadPath(undefined);
                       setUploadName("");
+                      setArtwork(({ source: _source, ...current }) => current);
                     }}
                   >
                     Remove

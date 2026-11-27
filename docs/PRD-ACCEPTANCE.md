@@ -11,7 +11,7 @@ Run the current suite rather than relying on historical test counts. Credential-
 | Saved/reusable artwork | resource/history/save-queue tests and opt-in studio acceptance | Multi-tab conflict and full expiry/device acceptance remain |
 | Payment capture | signed event/session reconciliation and database replay/gate tests | CI does not charge Stripe; complete real test-mode hosted acceptance separately |
 | CSV and print files | 36 family/layout/orientation cases plus a 500-row distinct-output render regression and PGlite tests | Hosted maximum-volume capacity and physical press/cutting certification remain |
-| Proof version and customer approval | database stale-proof/payment/approval tests and pipeline smoke script | Representative source-file fidelity requires operator acceptance |
+| Proof version and customer approval | database stale-proof/payment/approval tests and pipeline smoke script | Automated tests cover PDF, PDF-compatible AI, SVG and PNG fidelity; physical output still needs operator acceptance |
 | Receipts and customer emails | PDF-generation/attachment/transport tests and authenticated service acceptance | SMTP at least once; domain/bounce/volume acceptance remains |
 | Customer workspace/reorders | project-status/resources and service checks | Broader responsive/screen-reader matrix remains |
 | Staff pipeline/downloads/reports | database gates and isolated service/pipeline checks | Operating roles, alerts and recovery drills remain |
