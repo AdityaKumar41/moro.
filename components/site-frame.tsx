@@ -11,16 +11,7 @@ export function SiteFrame({
   sandbox: boolean;
 }) {
   const path = usePathname();
-  const isPublic = [
-    "/",
-    "/products",
-    "/work",
-    "/privacy",
-    "/terms",
-    "/auth",
-    "/auth/reset",
-    "/studio",
-  ].includes(path);
+  const isPublic = !["/account", "/admin", "/studio"].includes(path);
   const workspace = ["/studio", "/account", "/admin"].includes(path);
   const auth = path.startsWith("/auth");
   return (

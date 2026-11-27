@@ -1,0 +1,210 @@
+.tools {
+  min-width: 0;
+}
+.tools > h2 {
+  margin: 0 0 22px;
+  font-size: 24px;
+  letter-spacing: -0.7px;
+}
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 26px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #ded5c6;
+}
+.tabs button {
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  padding: 10px 14px;
+  color: #736c60;
+  min-height: 44px;
+  font-size: 13px;
+  text-transform: capitalize;
+}
+.tabs button:hover {
+  background: #f3ebdd;
+}
+.tabs button[aria-pressed="true"] {
+  color: #fffaf1;
+  background: #191b17;
+}
+.productToolbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 22px;
+}
+.productToolbar label {
+  width: min(100%, 420px);
+  font-size: 13px;
+}
+.productToolbar > button {
+  flex-shrink: 0;
+  min-height: 44px;
+  font-size: 13px;
+}
+.productToolbar select {
+  min-height: 44px;
+  font-size: 14px;
+}
+.productForm {
+  border: 1px solid #ded5c6;
+  background: #fffdf8;
+  border-radius: 16px;
+  padding: 28px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 24px;
+}
+.productForm > label,
+.productForm > p,
+.productForm > button,
+.formHeading {
+  grid-column: 1/-1;
+}
+.productForm > :global(.field-row) {
+  display: contents;
+}
+.productForm label {
+  font-size: 13px;
+  min-width: 0;
+  margin: 0;
+}
+.productForm input,
+.productForm select {
+  min-height: 44px;
+  font-size: 14px;
+  width: 100%;
+}
+.productForm input[type="color"] {
+  padding: 5px;
+}
+.productForm input[type="checkbox"] {
+  min-height: 18px;
+  height: 18px;
+}
+.productForm > button {
+  justify-self: start;
+  margin-top: 4px;
+}
+.formHeading {
+  border-bottom: 1px solid #e9e0d1;
+  padding-bottom: 18px;
+  margin-bottom: 2px;
+}
+.formHeading h3 {
+  margin: 0 0 8px;
+  font-size: 19px;
+  font-weight: 500;
+}
+.formHeading p {
+  margin: 0;
+  color: #736c60;
+  font-size: 13px;
+}
+.card {
+  padding: 22px;
+  border: 1px solid #ded5c6;
+  background: #fffdf8;
+  border-radius: 14px;
+  margin: 14px 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.card h3 {
+  margin: 0 0 8px;
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: -0.3px;
+}
+.card p {
+  margin: 8px 0 16px;
+  font-size: 13px;
+  color: #736c60;
+}
+.card label {
+  display: block;
+  max-width: 300px;
+  margin: 16px 0 0;
+  font-size: 13px;
+}
+.card select {
+  min-height: 44px;
+  font-size: 14px;
+}
+.card > :global(.badge) {
+  margin-bottom: 12px;
+}
+.tools :global(.notice) {
+  margin: 16px 0;
+  padding: 14px 16px;
+  overflow-wrap: anywhere;
+}
+.tools > :global(.button) {
+  margin: 0 8px 12px 0;
+}
+.loading {
+  display: grid;
+  gap: 16px;
+}
+.loading > div {
+  height: 140px;
+  border-radius: 14px;
+}
+.empty {
+  padding: 40px 24px;
+  border: 1px dashed #d9cbb6;
+  border-radius: 14px;
+  text-align: center;
+  margin: 20px 0;
+}
+.empty h3 {
+  font-size: 20px;
+  font-weight: 500;
+  margin: 0 0 10px;
+}
+.empty p {
+  font-size: 13px;
+  color: #736c60;
+}
+@media (max-width: 700px) {
+  .tools > h2 {
+    font-size: 22px;
+  }
+  .tabs {
+    gap: 4px;
+    margin-bottom: 20px;
+  }
+  .tabs button {
+    padding: 9px 12px;
+  }
+  .productToolbar {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .productToolbar label {
+    width: 100%;
+  }
+  .productForm {
+    padding: 20px;
+    gap: 18px 14px;
+  }
+  .productForm input,
+  .productForm select,
+  .card select,
+  .productToolbar select {
+    font-size: 16px;
+  }
+  .card {
+    padding: 20px;
+  }
+}
+@media (max-width: 420px) {
+  .productForm {
+    grid-template-columns: 1fr;
+  }
+}

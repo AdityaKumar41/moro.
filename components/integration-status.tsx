@@ -1,5 +1,7 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { CreditCard, Mail, ArrowUpRight, RefreshCw } from "lucide-react";
+import styles from "./integration-status.module.css";
 type Status = {
   payments: {
     configured: boolean;
@@ -20,39 +22,89 @@ type Status = {
 export function IntegrationStatus() {
   const [status, setStatus] = useState<Status>();
   const [error, setError] = useState("");
-  useEffect(() => {
-    fetch("/api/admin/integrations")
-      .then(async (r) => {
-        const d = await r.json();
-        if (!r.ok) throw Error(d.error);
-        setStatus(d);
-      })
-      .catch((e) => setError(e.message));
+  const [loading, setLoading] = useState(true);
+  const load = useCallback(async (signal?: AbortSignal) => {
+    setLoading(true);
+    setError("");
+    try {
+      const r = await fetch("/api/admin/integrations", { signal });
+      const data = await r.json();
+      if (!r.ok) throw Error(data.error || "Connections could not be checked.");
+      if (!signal?.aborted) setStatus(data);
+    } catch (e) {
+      if (!signal?.aborted) setError((e as Error).message);
+    } finally {
+      if (!signal?.aborted) setLoading(false);
+    }
   }, []);
-  if (error) return <p className="notice">{error}</p>;
+  useEffect(() => {
+    const controller = new AbortController();
+    void load(controller.signal);
+    return () => controller.abort();
+  }, [load]);
+  if (!status && loading)
+    return (
+      <section
+        className={styles.loading}
+        role="status"
+        aria-label="Checking service connections"
+      >
+        <div className="skeleton-block" />
+        <div className="skeleton-block" />
+      </section>
+    );
   if (!status)
-    return <p className="editor-caption">Checking service connections…</p>;
+    return (
+      <section className={styles.error} role="alert">
+        <h2>Connections couldn’t be checked.</h2>
+        <p>{error}</p>
+        <button className="button outline" onClick={() => void load()}>
+          Try again
+        </button>
+      </section>
+    );
   return (
-    <>
-      <h2 className="panel-title">Connected to the real work.</h2>
-      <div className="integration-cards">
-        <article className="saved-card">
-          <span className="eyebrow">STRIPE CHECKOUT</span>
+    <section className={styles.connections}>
+      <div className={styles.heading}>
+        <div>
+          <h2>Service connections</h2>
+          <p>The services behind your orders and customer updates.</p>
+        </div>
+        <button
+          className="button outline"
+          disabled={loading}
+          onClick={() => void load()}
+        >
+          <RefreshCw size={15} />
+          {loading ? "Checking…" : "Refresh"}
+        </button>
+      </div>
+      {error && (
+        <p className="notice" role="alert">
+          {error}
+        </p>
+      )}
+      <div className={styles.cards}>
+        <article className={styles.card}>
+          <div className={styles.icon}>
+            <CreditCard size={23} />
+          </div>
+          <span className="eyebrow">PAYMENTS</span>
           <h3>
             {!status.payments.configured
               ? "Credentials needed"
               : status.payments.mode === "test"
                 ? status.payments.testReady
-                  ? "Test API connected"
-                  : "Sandbox connection needed"
+                  ? "Checkout connected"
+                  : "Connection needs attention"
                 : status.payments.chargesEnabled
                   ? "Ready to accept payments"
                   : "Account action required"}
           </h3>
           <p className="editor-caption">
             {status.payments.mode === "test"
-              ? "Stripe test environment"
-              : "Stripe live environment"}
+              ? "Stripe · Test mode"
+              : "Stripe · Live mode"}
           </p>
           {status.payments.error && (
             <p className="notice">{status.payments.error}</p>
@@ -66,11 +118,8 @@ export function IntegrationStatus() {
               </p>
             )}
           {status.payments.mode === "test" && (
-            <p className="notice">
-              No real money is charged. Use the India-issued test card shown at
-              checkout. Test mode can still apply country-specific payment
-              restrictions; a successful API connection alone does not verify a
-              payment.
+            <p className="editor-caption">
+              Payments are simulated. No real money is charged.
             </p>
           )}
           <a
@@ -79,11 +128,14 @@ export function IntegrationStatus() {
             target="_blank"
             rel="noreferrer"
           >
-            Open Stripe account
+            Open Stripe account <ArrowUpRight size={15} />
           </a>
         </article>
-        <article className="saved-card">
-          <span className="eyebrow">EMAIL DELIVERY</span>
+        <article className={styles.card}>
+          <div className={styles.icon}>
+            <Mail size={23} />
+          </div>
+          <span className="eyebrow">CUSTOMER EMAIL</span>
           <h3>
             {status.email.configured
               ? "Sender connected"
@@ -100,6 +152,6 @@ export function IntegrationStatus() {
           </p>
         </article>
       </div>
-    </>
+    </section>
   );
 }

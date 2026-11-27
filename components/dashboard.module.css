@@ -1,0 +1,293 @@
+/* Workspace cards are independent of storefront and artwork-card styles. */
+.workspace {
+  min-width: 0;
+}
+.workspace :global(.projects-content) {
+  min-width: 0;
+}
+.workspace :global(.stats) {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: 0 0 28px;
+}
+.workspace :global(.stats) > :global(.stat) {
+  min-width: 0;
+  padding: 22px;
+  background: #fffdf8;
+  border: 1px solid #ded5c6;
+  border-radius: 14px;
+}
+.workspace :global(.stats) :global(.stat) span {
+  font:
+    500 13px/1.5 "DM Sans",
+    sans-serif;
+  color: #736c60;
+}
+.workspace :global(.stats) :global(.stat) strong {
+  font:
+    500 32px/1.2 "DM Sans",
+    sans-serif;
+  letter-spacing: -1px;
+  overflow-wrap: anywhere;
+  margin-top: 12px;
+}
+.workspace :global(.projects-content) > :global(.panel-title) {
+  margin: 0 0 16px;
+  font-size: 24px;
+}
+.workspace :global(.filter-row) {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) auto auto auto;
+  padding: 14px;
+  gap: 10px;
+  background: #f3ebdd;
+  margin: 16px 0 24px;
+}
+.workspace :global(.filter-row) input,
+.workspace :global(.filter-row) select {
+  min-width: 0;
+  width: 100%;
+  min-height: 44px;
+  font-size: 13px;
+}
+.workspace :global(.editor-caption) {
+  font-size: 13px;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+.workspace :global(.projects-content) > form {
+  width: 100%;
+  max-width: 640px;
+}
+.workspace :global(.projects-content) > form label {
+  font-size: 13px;
+}
+.workspace :global(.projects-content) > form input {
+  font-size: 15px;
+  min-height: 44px;
+}
+.orderCard {
+  min-width: 0;
+  background: #fffdf8;
+  border: 1px solid #ded5c6;
+  border-radius: 16px;
+  margin: 0 0 20px;
+  overflow: hidden;
+}
+.orderHead {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 24px;
+  border-bottom: 1px solid #e9e0d1;
+}
+.orderPreview {
+  flex: 0 0 76px;
+  width: 76px;
+  height: 76px;
+  display: grid;
+  place-items: center;
+  padding: 10px;
+  background: #f3ebdd;
+  border: 1px solid #e9dfcf;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.orderPreview svg {
+  width: 100%;
+  max-height: 56px;
+  filter: drop-shadow(0 3px 3px #30221615);
+}
+.orderHead > div:not(.orderPreview) {
+  min-width: 0;
+  flex: 1;
+}
+.orderHead h3 {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.5;
+  margin: 0 0 6px;
+  letter-spacing: -0.35px;
+  overflow-wrap: anywhere;
+}
+.orderHead small {
+  font-size: 12px;
+  color: #736c60;
+}
+.orderHead > :global(.badge) {
+  flex-shrink: 0;
+  padding: 8px 11px;
+  font-size: 12px;
+  white-space: normal;
+  text-align: center;
+  max-width: 160px;
+}
+.orderBody {
+  padding: 22px 24px 24px;
+}
+.orderBody p {
+  font-size: 13px;
+  line-height: 1.7;
+  color: #736c60;
+  overflow-wrap: anywhere;
+  margin: 10px 0;
+}
+.orderBody p svg {
+  margin-right: 4px;
+}
+.orderBody :global(.order-actions) {
+  gap: 8px;
+  margin-top: 18px;
+}
+.orderBody :global(.order-actions) :global(.button) {
+  font-size: 12px;
+  padding: 10px 14px;
+  min-height: 42px;
+}
+.orderBody details {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #e9e0d1;
+}
+.orderBody summary {
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  min-height: 28px;
+}
+.progress {
+  display: flex;
+  gap: 5px;
+  height: 4px;
+  margin: 0 0 18px;
+}
+.progress span {
+  flex: 1;
+  border-radius: 4px;
+  background: #e9e3d7;
+}
+.progress span[data-complete="true"] {
+  background: #59734f;
+}
+@media (max-width: 1050px) {
+  .workspace :global(.filter-row) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .workspace :global(.filter-row) input:first-child {
+    grid-column: 1/-1;
+  }
+}
+@media (max-width: 700px) {
+  .workspace :global(.dashboard-side) {
+    display: flex;
+    flex-wrap: wrap;
+    overflow: visible;
+    white-space: normal;
+    gap: 4px;
+    padding: 8px 0;
+  }
+  .workspace :global(.dashboard-side) > button {
+    flex: 1 1 100px;
+    justify-content: flex-start;
+    font-size: 12px;
+    min-height: 44px;
+    padding: 10px;
+  }
+  .workspace :global(.dashboard-side) > button:nth-last-of-type(1) {
+    display: flex;
+  }
+  .workspace :global(.dashboard-side) > form {
+    display: block;
+    flex: 1 1 100px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  .workspace :global(.dashboard-side) > form button {
+    width: 100%;
+    min-height: 44px;
+    font-size: 12px;
+    margin: 0;
+  }
+  .workspace :global(.stats) {
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .workspace :global(.stats) > :global(.stat) {
+    padding: 14px 12px;
+    border-radius: 10px;
+  }
+  .workspace :global(.stats) :global(.stat) span {
+    font-size: 12px;
+  }
+  .workspace :global(.stats) :global(.stat) strong {
+    font-size: 25px;
+  }
+  .workspace :global(.filter-row) {
+    grid-template-columns: 1fr 1fr;
+    padding: 12px;
+  }
+  .workspace :global(.filter-row) input,
+  .workspace :global(.filter-row) select {
+    font-size: 16px;
+  }
+  .workspace :global(.filter-row) input[type="date"] {
+    grid-column: 1/-1;
+    max-width: none !important;
+  }
+  .workspace :global(.projects-content) > :global(.panel-title) {
+    font-size: 22px;
+  }
+  .orderHead {
+    padding: 18px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .orderPreview {
+    flex-basis: 60px;
+    width: 60px;
+    height: 60px;
+  }
+  .orderHead h3 {
+    font-size: 15px;
+  }
+  .orderHead > :global(.badge) {
+    margin-left: 72px;
+    max-width: none;
+  }
+  .orderBody {
+    padding: 18px;
+  }
+  .orderBody :global(.order-actions) :global(.button) {
+    min-height: 44px;
+  }
+  .workspace :global(.project-counts) span {
+    font-size: 12px !important;
+  }
+  .workspace :global(.project-counts) > button {
+    min-height: 105px;
+  }
+  .workspace :global(.project-card-copy) {
+    padding: 16px;
+  }
+  .workspace :global(.saved-grid) {
+    grid-template-columns: 1fr;
+  }
+  .workspace :global(.projects-welcome) p {
+    font-size: 13px;
+  }
+}
+@media (max-width: 380px) {
+  .workspace :global(.stats) {
+    grid-template-columns: 1fr;
+  }
+  .workspace :global(.stats) > :global(.stat) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .workspace :global(.stats) :global(.stat) strong {
+    margin: 0;
+  }
+}

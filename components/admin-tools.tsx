@@ -1,4 +1,5 @@
 "use client";
+import styles from "./admin-tools.module.css";
 import { requestJson as post } from "@/lib/client-request";
 import { queueAge, type OperationsHealth } from "@/lib/operations";
 import { useEffect, useState } from "react";
@@ -20,6 +21,7 @@ export function AdminTools() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [health, setHealth] = useState<OperationsHealth>();
   const [refreshing, setRefreshing] = useState(false);
+  const [loaded, setLoaded] = useState(false);
   const [templates, setTemplates] = useState<
     { id: string; name: string; product_id: string }[]
   >([]);
@@ -40,6 +42,7 @@ export function AdminTools() {
       return false;
     } finally {
       setRefreshing(false);
+      setLoaded(true);
     }
   }
   useEffect(() => {
@@ -62,9 +65,9 @@ export function AdminTools() {
     }
   }
   return (
-    <>
+    <section className={styles.tools}>
       <h2 className="panel-title">Behind the good work.</h2>
-      <div className="tabs">
+      <nav className={styles.tabs} aria-label="Store management sections">
         {[
           "products",
           "users",
@@ -81,7 +84,7 @@ export function AdminTools() {
             {t}
           </button>
         ))}
-      </div>
+      </nav>
       {message && (
         <p role="status" className="notice">
           {message}
@@ -93,38 +96,51 @@ export function AdminTools() {
           saved designs stay private.
         </p>
       )}
-      {tab === "products" ? (
+      {!loaded && tab !== "products" ? (
+        <div
+          className={styles.loading}
+          role="status"
+          aria-label="Loading management records"
+        >
+          {[1, 2, 3].map((n) => (
+            <div className="skeleton-block" key={n} />
+          ))}
+        </div>
+      ) : tab === "products" ? (
         <>
-          <label>
-            Product definition
-            <select
-              value={current.id}
-              onChange={(e) =>
-                setCurrent(catalogue.find((p) => p.id === e.target.value)!)
+          <div className={styles.productToolbar}>
+            <label>
+              Product definition
+              <select
+                value={current.id}
+                onChange={(e) =>
+                  setCurrent(catalogue.find((p) => p.id === e.target.value)!)
+                }
+              >
+                {catalogue.map((p) => (
+                  <option value={p.id} key={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button
+              className="text-link"
+              onClick={() =>
+                setCurrent({
+                  ...catalogue[0],
+                  id: "new-division",
+                  name: "New division",
+                  short: "New",
+                  approved: false,
+                })
               }
             >
-              {catalogue.map((p) => (
-                <option value={p.id} key={p.id}>
-                  {p.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <button
-            className="text-link"
-            onClick={() =>
-              setCurrent({
-                ...catalogue[0],
-                id: "new-division",
-                name: "New division",
-                short: "New",
-                approved: false,
-              })
-            }
-          >
-            Add a division
-          </button>
+              Add a division
+            </button>
+          </div>
           <form
+            className={styles.productForm}
             key={current.id}
             onSubmit={async (e) => {
               e.preventDefault();
@@ -166,6 +182,13 @@ export function AdminTools() {
               }
             }}
           >
+            <div className={styles.formHeading}>
+              <h3>Product details</h3>
+              <p>
+                Define the materials, pricing and print settings for this
+                division.
+              </p>
+            </div>
             <div className="field-row">
               <label>
                 Product ID
@@ -245,7 +268,7 @@ export function AdminTools() {
                   type="number"
                   min={0.01}
                   step={0.01}
-                  defaultValue={current.rate / 100}
+                  defaultValue={(current.rate / 100).toFixed(2)}
                   required
                 />
               </label>
@@ -256,7 +279,7 @@ export function AdminTools() {
                   type="number"
                   min={0}
                   step={0.01}
-                  defaultValue={current.setup / 100}
+                  defaultValue={(current.setup / 100).toFixed(2)}
                   required
                 />
               </label>
@@ -333,7 +356,7 @@ export function AdminTools() {
               Prices and tax classification have been approved
             </label>
             <button className="button" disabled={busy}>
-              Save product
+              {busy ? "Saving product…" : "Save product"}
             </button>
             <p className="editor-caption">
               The base unit price scales with area; alternative materials
@@ -348,12 +371,14 @@ export function AdminTools() {
             The latest 200 account profiles. Changes are audited. The final
             administrator cannot be demoted.
           </p>
+          {!users.length && (
+            <div className={styles.empty}>
+              <h3>No accounts to display.</h3>
+              <p>New customer profiles will appear here.</p>
+            </div>
+          )}
           {users.map((u) => (
-            <article
-              className="saved-card"
-              key={u.id}
-              style={{ marginBottom: 10 }}
-            >
+            <article className={styles.card} key={u.id}>
               <h3>{u.name || "Unnamed account"}</h3>
               <p className="editor-caption">
                 {u.id} · {u.company || "Individual"}
@@ -381,8 +406,16 @@ export function AdminTools() {
             studio. Removing a template does not change existing orders or
             proofs.
           </p>
+          {!templates.length && (
+            <div className={styles.empty}>
+              <h3>A starting point for every idea.</h3>
+              <p>
+                Create a shared layout using Save as template in the studio.
+              </p>
+            </div>
+          )}
           {templates.map((t) => (
-            <article className="saved-card" key={t.id}>
+            <article className={styles.card} key={t.id}>
               <h3>{t.name}</h3>
               <p>{t.product_id}</p>
               <button
@@ -495,7 +528,7 @@ export function AdminTools() {
               ) : (
                 <div className="ops-delivery-list">
                   {health.deliveries.map((n) => (
-                    <article className="saved-card" key={n.id}>
+                    <article className={styles.card} key={n.id}>
                       <div className="ops-delivery-title">
                         <h5>
                           DH-{n.order_number} · {n.kind.replaceAll("_", " ")}
@@ -564,17 +597,23 @@ export function AdminTools() {
               }
             }}
           >
-            Process queued artwork
+            {busy ? "Processing artwork…" : "Process queued artwork"}
           </button>
-          <button className="button outline small" onClick={refresh}>
-            Refresh jobs
+          <button
+            className="button outline small"
+            disabled={refreshing || busy}
+            onClick={refresh}
+          >
+            {refreshing ? "Refreshing…" : "Refresh jobs"}
           </button>
+          {!jobs.length && (
+            <div className={styles.empty}>
+              <h3>The queue is clear.</h3>
+              <p>Artwork jobs appear here after payment or a proof revision.</p>
+            </div>
+          )}
           {jobs.map((j) => (
-            <article
-              className="saved-card"
-              key={j.id}
-              style={{ marginTop: 12 }}
-            >
+            <article className={styles.card} key={j.id}>
               <span className="badge">{j.state}</span>
               <h3>
                 {j.kind} · {j.order_id.slice(0, 8)}
@@ -594,6 +633,6 @@ export function AdminTools() {
           ))}
         </>
       )}
-    </>
+    </section>
   );
 }

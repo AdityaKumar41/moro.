@@ -1,4 +1,6 @@
 "use client";
+import styles from "./dashboard.module.css";
+import { ProductionFiles } from "./production-files";
 import { orderSearchUrl } from "@/lib/order-search";
 import { TestPaymentGuide } from "./test-payment-guide";
 import {
@@ -464,7 +466,7 @@ export default function Dashboard({ admin = false }: { admin?: boolean }) {
       </section>
     );
   return (
-    <section className="moro-projects">
+    <section className={"moro-projects " + styles.workspace}>
       {busy && (
         <div className="workspace-action-status" role="status">
           <span className="busy-dot" aria-hidden="true" />
@@ -523,7 +525,7 @@ export default function Dashboard({ admin = false }: { admin?: boolean }) {
         </p>
       )}
       <div className="dashboard-grid">
-        <aside className="dashboard-side">
+        <aside className="dashboard-side" aria-label="Workspace navigation">
           {(admin
             ? [
                 [Package, "orders", "Production queue"],
@@ -981,8 +983,15 @@ export default function Dashboard({ admin = false }: { admin?: boolean }) {
                     (a, b) => b.version - a.version,
                   )[0];
                   return (
-                    <article className="order-card" key={o.id}>
-                      <div className="order-head">
+                    <article className={styles.orderCard} key={o.id}>
+                      <div className={styles.orderHead}>
+                        <div className={styles.orderPreview}>
+                          <ArtworkThumbnail
+                            artwork={latest?.artwork ?? o.artwork}
+                            configuration={o.configuration}
+                            variables={o.variable_data[0]}
+                          />
+                        </div>
                         <div>
                           <h3>
                             {o.pricing?.sandbox && (
@@ -1027,17 +1036,15 @@ export default function Dashboard({ admin = false }: { admin?: boolean }) {
                               }[o.payment_status] || o.payment_status}
                         </span>
                       </div>
-                      <div className="order-body">
+                      <div className={styles.orderBody}>
                         <div
-                          className="progress"
+                          className={styles.progress}
                           aria-label={`Current stage: ${o.status}`}
                         >
                           {stages.map((s, i) => (
                             <span
                               key={s}
-                              className={
-                                i <= stages.indexOf(o.status) ? "done" : ""
-                              }
+                              data-complete={i <= stages.indexOf(o.status)}
                             />
                           ))}
                         </div>
@@ -1196,29 +1203,12 @@ export default function Dashboard({ admin = false }: { admin?: boolean }) {
                         {admin &&
                           o.approved_proof_id &&
                           o.payment_status === "paid" && (
-                            <details style={{ marginTop: 15 }}>
-                              <summary>
-                                Production files ({o.artifacts.length})
-                              </summary>
-                              {!o.artifacts.length && (
-                                <p className="editor-caption">
-                                  {o.production_state === "failed"
-                                    ? "Rendering failed. Retry the job from Store management."
-                                    : "Files are being prepared. Refresh when rendering completes."}
-                                </p>
-                              )}
-                              <div className="order-actions">
-                                {o.artifacts.map((a) => (
-                                  <a
-                                    className="button outline"
-                                    key={a.id}
-                                    href={`/api/orders/${o.id}/files?artifact=${a.id}`}
-                                  >
-                                    Row {a.row_number} · {a.kind.toUpperCase()}
-                                  </a>
-                                ))}
-                              </div>
-                            </details>
+                            <ProductionFiles
+                              orderId={o.id}
+                              proofId={o.approved_proof_id}
+                              artifacts={o.artifacts}
+                              state={o.production_state}
+                            />
                           )}
                         {o.proofs.length > 1 && (
                           <details style={{ marginTop: 15 }}>
@@ -1287,18 +1277,22 @@ export default function Dashboard({ admin = false }: { admin?: boolean }) {
                 <div className="empty-state">
                   <Package size={32} />
                   <h2>
-                    {orders.length
-                      ? tab === "proofs"
-                        ? "You’re all caught up."
-                        : "No matching orders."
-                      : "Something great starts here."}
+                    {tab === "proofs"
+                      ? "You’re all caught up."
+                      : orders.length
+                        ? "No matching orders."
+                        : admin
+                          ? "The queue is clear."
+                          : "Something great starts here."}
                   </h2>
                   <p>
-                    {orders.length
-                      ? tab === "proofs"
-                        ? "There are no artwork proofs awaiting your approval."
-                        : "Try another search or filter."
-                      : "Your orders and proofs will appear here once you’ve created your first project."}
+                    {tab === "proofs"
+                      ? "There are no artwork proofs awaiting your approval."
+                      : orders.length
+                        ? "Try another search or filter."
+                        : admin
+                          ? "New orders will appear here with their artwork and production status."
+                          : "Your orders and proofs will appear here once you’ve created your first project."}
                   </p>
                   <Link href="/studio" className="button">
                     Start creating
