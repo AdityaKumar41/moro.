@@ -1,7 +1,7 @@
 import { strict as assert } from "node:assert";
 import https from "node:https";
 import http from "node:http";
-import { writeFile, mkdir } from "node:fs/promises";
+import { writeFile, mkdir, readFile } from "node:fs/promises";
 import { createServerClient } from "@supabase/ssr";
 import sharp, { type Metadata } from "sharp";
 import { PDFDocument } from "pdf-lib";
@@ -104,9 +104,11 @@ async function main() {
   ]);
   const db = adminDb(),
     customer = await cookie("CUSTOMER"),
-    admin = await cookie("ADMIN"),
-    designId = crypto.randomUUID();
+    admin = await cookie("ADMIN");
+  let designId = crypto.randomUUID();
   let id: string | undefined;
+  let approvalGateChecked = false;
+  const resuming = process.env.ACCEPTANCE_RESUME === "true";
   const capability = await call("/api/admin/integrations", { cookie: admin });
   assert.equal(capability.status, 200);
   assert.equal(
@@ -114,6 +116,40 @@ async function main() {
     true,
     "Deploy the targeted worker before running hosted batch acceptance",
   );
+  if (resuming) {
+    const manifest = JSON.parse(
+      await readFile("tmp/batch-acceptance/manifest.json", "utf8"),
+    );
+    assert.match(
+      manifest.orderId,
+      /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/,
+    );
+    assert.match(
+      manifest.designId,
+      /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/,
+    );
+    const fixture = await db
+      .from("orders")
+      .select("customer_id,artwork,checkout_id,payment_ref")
+      .eq("id", manifest.orderId)
+      .single();
+    assert.ifError(fixture.error);
+    assert.equal(fixture.data.customer_id, process.env.CUSTOMER_ID);
+    assert.equal(fixture.data.artwork.name, "BATCH ACCEPTANCE - DELETE");
+    assert.equal(fixture.data.checkout_id, "batch_fixture_" + manifest.orderId);
+    assert.equal(fixture.data.payment_ref, "synthetic_batch_fixture");
+    const design = await db
+      .from("designs")
+      .select("customer_id,name")
+      .eq("id", manifest.designId)
+      .single();
+    assert.ifError(design.error);
+    assert.equal(design.data.customer_id, process.env.CUSTOMER_ID);
+    assert.equal(design.data.name, "BATCH ACCEPTANCE - DELETE");
+    id = manifest.orderId;
+    designId = manifest.designId;
+    approvalGateChecked = manifest.approvalGateChecked === true;
+  }
   const c = { ...defaultConfig("race"), width: 60, height: 40, quantity: 500 };
   const artwork: Artwork = {
     name: "BATCH ACCEPTANCE - DELETE",
@@ -143,63 +179,74 @@ async function main() {
     await mkdir("tmp/batch-acceptance", { recursive: true });
     await writeFile(
       "tmp/batch-acceptance/manifest.json",
-      JSON.stringify({ orderId: id, designId, stored, completed }),
+      JSON.stringify({
+        orderId: id,
+        designId,
+        stored,
+        completed,
+        approvalGateChecked,
+      }),
       { mode: 0o600 },
     );
   };
   try {
-    const created = await call(
-      "/api/orders",
-      { cookie: customer },
-      {
-        requestKey: crypto.randomUUID(),
-        designId,
-        artwork,
-        configuration: c,
-        variableData: rows,
-        shipping: {
-          name: "BATCH ACCEPTANCE - DELETE",
-          email: process.env.CUSTOMER_EMAIL,
-          phone: "9999999999",
-          line1: "Test building 123",
-          city: "Bengaluru",
-          state: "Karnataka",
-          pincode: "560001",
-          gstin: "",
+    if (!resuming) {
+      const created = await call(
+        "/api/orders",
+        { cookie: customer },
+        {
+          requestKey: crypto.randomUUID(),
+          designId,
+          artwork,
+          configuration: c,
+          variableData: rows,
+          shipping: {
+            name: "BATCH ACCEPTANCE - DELETE",
+            email: process.env.CUSTOMER_EMAIL,
+            phone: "9999999999",
+            line1: "Test building 123",
+            city: "Bengaluru",
+            state: "Karnataka",
+            pincode: "560001",
+            gstin: "",
+          },
         },
-      },
-    );
-    assert.equal(created.status, 201, created.body.toString());
-    id = JSON.parse(created.body.toString()).id;
-    await note();
+      );
+      assert.equal(created.status, 201, created.body.toString());
+      id = JSON.parse(created.body.toString()).id;
+      await note();
+      const order = await db.from("orders").select("*").eq("id", id).single();
+      assert.ifError(order.error);
+      const checkout = "batch_fixture_" + id;
+      assert.ifError(
+        (await db.from("orders").update({ checkout_id: checkout }).eq("id", id))
+          .error,
+      );
+      // Named synthetic fixture, not a Stripe charge. Exercise the real deployed
+      // proof/production worker; never claim another order or dispatch the outbox.
+      assert.ifError(
+        (
+          await db.rpc("apply_payment", {
+            p_event: "batch_fixture_" + id,
+            p_order: id,
+            p_reference: "synthetic_batch_fixture",
+            p_amount: order.data.total,
+            p_currency: order.data.currency,
+            p_checkout: checkout,
+            p_state: "paid",
+          })
+        ).error,
+      );
+      await db.from("notifications").delete().eq("order_id", id);
+    }
     const order = await db.from("orders").select("*").eq("id", id).single();
     assert.ifError(order.error);
-    const checkout = "batch_fixture_" + id;
-    assert.ifError(
-      (await db.from("orders").update({ checkout_id: checkout }).eq("id", id))
-        .error,
-    );
-    // Named synthetic fixture, not a Stripe charge. Exercise the real deployed
-    // proof/production worker; never claim another order or dispatch the outbox.
-    assert.ifError(
-      (
-        await db.rpc("apply_payment", {
-          p_event: "batch_fixture_" + id,
-          p_order: id,
-          p_reference: "synthetic_batch_fixture",
-          p_amount: order.data.total,
-          p_currency: order.data.currency,
-          p_checkout: checkout,
-          p_state: "paid",
-        })
-      ).error,
-    );
-    await db.from("notifications").delete().eq("order_id", id);
     async function run(kind: string) {
-      for (let attempt = 0; attempt < 150; attempt++) {
+      const deadline = Date.now() + 30 * 60 * 1000;
+      while (Date.now() < deadline) {
         const result = await db
           .from("jobs")
-          .select("state,completed_rows,last_error")
+          .select("state,completed_rows,last_error,locked_until")
           .eq("order_id", id!)
           .eq("kind", kind)
           .single();
@@ -210,6 +257,14 @@ async function main() {
           "failed",
           result.data.last_error || "Batch failed",
         );
+        if (
+          result.data.state === "running" &&
+          result.data.locked_until &&
+          Date.parse(result.data.locked_until) > Date.now()
+        ) {
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+          continue;
+        }
         const work = await call("/api/worker?order=" + id, {
           authorization: "Bearer " + process.env.WORKER_TOKEN,
         });
@@ -221,7 +276,7 @@ async function main() {
         );
         const progress = await db
           .from("jobs")
-          .select("state,completed_rows,last_error")
+          .select("state,completed_rows,last_error,locked_until")
           .eq("order_id", id!)
           .eq("kind", kind)
           .single();
@@ -247,7 +302,10 @@ async function main() {
       .eq("order_id", id)
       .single();
     assert.ifError(proof.error);
-    assert.equal(proof.data.state, "ready");
+    assert.equal(
+      proof.data.state,
+      order.data.approved_proof_id ? "approved" : "ready",
+    );
     const folder = proof.data.preview_path.slice(
       0,
       proof.data.preview_path.lastIndexOf("/"),
@@ -261,28 +319,38 @@ async function main() {
     for (const f of files.data!)
       stored.push({ bucket: "proofs", path: folder + "/" + f.name });
     await note();
-    const blocked = await call(
-      "/api/orders/" + id + "/files?artifact=" + crypto.randomUUID(),
-      {
-        cookie: admin,
-      },
-    );
-    assert.equal(
-      blocked.status,
-      403,
-      "Production must remain locked before approval",
-    );
-    assert.ifError(
-      (
-        await db.rpc("order_action", {
-          p_order: id,
-          p_actor: process.env.CUSTOMER_ID,
-          p_action: "approve",
-          p_payload: { proofId: proof.data.id },
-        })
-      ).error,
-    );
-    await db.from("notifications").delete().eq("order_id", id);
+    if (order.data.approved_proof_id) {
+      assert(
+        resuming && approvalGateChecked,
+        "Resume requires recorded approval-gate acceptance",
+      );
+      assert.equal(order.data.approved_proof_id, proof.data.id);
+    } else {
+      const blocked = await call(
+        "/api/orders/" + id + "/files?artifact=" + crypto.randomUUID(),
+        {
+          cookie: admin,
+        },
+      );
+      assert.equal(
+        blocked.status,
+        403,
+        "Production must remain locked before approval",
+      );
+      approvalGateChecked = true;
+      await note();
+      assert.ifError(
+        (
+          await db.rpc("order_action", {
+            p_order: id,
+            p_actor: process.env.CUSTOMER_ID,
+            p_action: "approve",
+            p_payload: { proofId: proof.data.id },
+          })
+        ).error,
+      );
+      await db.from("notifications").delete().eq("order_id", id);
+    }
     console.log("Running deployed 500-row production job…");
     await run("production");
     const artifacts = await db
