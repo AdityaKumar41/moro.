@@ -1,0 +1,2570 @@
+/* Product workspaces: shared Moro identity, task-focused chrome. */
+.moro-app {
+  --ink: #191b17;
+  --muted: #736c60;
+  --line: #ded5c6;
+  --accent: #191b17;
+  --paper: #fffaf1;
+  color: var(--ink);
+  background: #fffaf1;
+  min-height: 100dvh;
+  font-family: "DM Sans", sans-serif;
+}
+.moro-app button,
+.moro-app input,
+.moro-app select,
+.moro-app textarea {
+  font-family: inherit;
+}
+.moro-app .button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #191b17;
+  border: 1px solid #191b17;
+  color: #fffaf1;
+  border-radius: 999px;
+  min-height: 40px;
+  padding: 10px 18px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  letter-spacing: 0;
+}
+.moro-app .button.outline {
+  background: transparent;
+  color: #191b17;
+  border-color: #c7cec1;
+}
+.moro-app button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.moro-app input,
+.moro-app textarea,
+.moro-app select {
+  color: #29251f;
+  background: #fffef9;
+  border: 1px solid #ddd4c5;
+  border-radius: 7px;
+  font-size: 13px;
+  padding: 10px 12px;
+  max-width: 100%;
+}
+.moro-app label {
+  font-size: 12px;
+  color: #625a4d;
+}
+.moro-app :focus-visible {
+  outline: 2px solid #b14c30;
+  outline-offset: 3px;
+}
+.moro-app .eyebrow {
+  font:
+    500 10px/1.5 "DM Sans",
+    sans-serif;
+  letter-spacing: 0.12em;
+  color: #756d5f;
+}
+.workspace-disclosure {
+  position: fixed;
+  bottom: 5px;
+  right: 15px;
+  font:
+    9px/1.3 "DM Sans",
+    sans-serif;
+  color: #756d5f;
+  z-index: 4;
+  pointer-events: none;
+}
+.moro-logo {
+  white-space: nowrap;
+}
+.auth-appbar {
+  height: 74px;
+  padding: 0 5vw;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fffaf1;
+}
+.auth-appbar > a:last-child {
+  font-size: 12px;
+  color: #625a4d;
+}
+.moro-public:has(.moro-auth) {
+  min-height: 100dvh;
+}
+.moro-public .moro-auth {
+  min-height: calc(100dvh - 74px);
+  padding-top: 35px;
+  padding-bottom: 50px;
+}
+.moro-public .moro-auth .auth-story {
+  padding-top: 20px;
+}
+.auth-skeleton {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7%;
+  padding: 45px 8vw;
+  min-height: 75dvh;
+}
+.auth-skeleton > div {
+  border-radius: 20px;
+}
+.auth-skeleton section {
+  padding-top: 60px;
+  display: grid;
+  gap: 22px;
+  align-content: start;
+}
+.auth-skeleton section i {
+  height: 45px;
+}
+.sr-only {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.workspace-skeleton {
+  min-height: 100dvh;
+  background: #fffaf1;
+  color: #191b17;
+}
+.skeleton-block {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  background: #ebe2d2;
+  border-radius: 8px;
+}
+.skeleton-block:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, #ffffff80, transparent);
+  animation: skeleton-sweep 1.7s infinite;
+}
+.skeleton-appbar {
+  height: 66px;
+  border-bottom: 1px solid #dddfd4;
+  display: flex;
+  gap: 30px;
+  align-items: center;
+  padding: 0 30px;
+  background: #fffaf1;
+}
+.skeleton-appbar i {
+  height: 24px;
+  width: 70px;
+}
+.skeleton-appbar i:nth-child(2) {
+  width: 200px;
+}
+.skeleton-appbar i:last-child {
+  margin-left: auto;
+  width: 130px;
+  height: 36px;
+}
+.skeleton-body {
+  display: grid;
+  grid-template-columns: 210px 1fr;
+  min-height: calc(100dvh - 66px);
+}
+.skeleton-body > aside {
+  padding: 35px 24px;
+  border-right: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.skeleton-body > aside i {
+  height: 30px;
+}
+.skeleton-content {
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.skeleton-heading {
+  height: 130px;
+  max-width: 100%;
+}
+.skeleton-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.skeleton-cards i {
+  height: 220px;
+}
+.skeleton-row {
+  height: 80px;
+}
+.skeleton-studio .skeleton-body {
+  grid-template-columns: 300px 1fr;
+}
+.skeleton-tools {
+  height: 42px;
+  width: 70%;
+  align-self: center;
+}
+.skeleton-art {
+  width: min(440px, 70%);
+  aspect-ratio: 1;
+  margin: auto;
+  box-shadow: 0 15px 40px #242e2110;
+}
+.workspace-error {
+  min-height: 75dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 30px;
+  text-align: center;
+  background: #fffaf1;
+}
+.workspace-error h1 {
+  font-size: 28px;
+}
+.workspace-error p {
+  font-size: 14px;
+  color: #736c60;
+}
+.workspace-error a {
+  font-size: 12px;
+  text-decoration: underline;
+}
+@keyframes skeleton-sweep {
+  to {
+    transform: translateX(100%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-block:after {
+    animation: none;
+    transform: none;
+    background: #ffffff20;
+  }
+}
+/* Projects */
+.moro-projects {
+  max-width: 1600px;
+  margin: auto;
+  min-height: 100dvh;
+  padding-bottom: 45px;
+}
+.projects-appbar {
+  height: 70px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding: 0 40px;
+  background: #fffaf1;
+}
+.projects-appbar .moro-logo {
+  font-size: 31px;
+}
+.workspace-purpose {
+  font-size: 11px;
+  border-left: 1px solid #d0d6c8;
+  padding-left: 26px;
+  color: #736c60;
+}
+.projects-appbar > div {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  margin-left: auto;
+  font-size: 12px;
+}
+.profile-avatar {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #f0e2cb;
+  color: #191b17;
+  font-size: 12px;
+}
+.moro-projects .dashboard-top {
+  padding: 33px 40px 28px;
+  margin: 0;
+  gap: 20px;
+  align-items: center;
+  border: 0;
+}
+.moro-projects .page-title {
+  font-size: 35px;
+  font-weight: 500;
+  letter-spacing: -1.4px;
+  margin: 5px 0;
+}
+.projects-description {
+  font-size: 12px;
+  color: #736c60;
+  margin: 6px 0 0;
+}
+.moro-projects .dashboard-grid {
+  grid-template-columns: 185px minmax(0, 1fr);
+  gap: 30px;
+  padding: 0 40px;
+}
+.moro-projects .dashboard-side {
+  padding: 5px 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  position: sticky;
+  top: 20px;
+  align-self: start;
+  min-width: 0;
+}
+.moro-projects .dashboard-side button {
+  padding: 12px;
+  font-size: 12px;
+  border: 0;
+  background: transparent;
+  border-radius: 8px;
+  gap: 10px;
+  color: #736c60;
+  margin: 3px 0;
+  min-height: 42px;
+}
+.moro-projects .dashboard-side button.selected {
+  background: #f0e2cb;
+  color: #191b17;
+  font-weight: 600;
+}
+.moro-projects .dashboard-side form {
+  margin-top: 25px;
+  border-top: 1px solid #ded5c6;
+  padding-top: 12px;
+}
+.moro-projects .dashboard-side svg {
+  width: 16px;
+  height: 16px;
+}
+.nav-count {
+  margin-left: auto;
+  border-radius: 4px;
+  background: #191b17;
+  color: #fff;
+  padding: 2px 5px;
+  font-size: 10px;
+}
+.projects-content {
+  min-width: 0;
+}
+.projects-welcome {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  background: #f5e9d7;
+  border: 1px solid #e8d6b9;
+  border-radius: 14px;
+  padding: 32px;
+  gap: 20px;
+  overflow: hidden;
+}
+.projects-welcome h2 {
+  font-size: 36px;
+  font-weight: 500;
+  line-height: 1.12;
+  letter-spacing: -1.4px;
+  margin: 14px 0;
+}
+.projects-welcome h2 em {
+  font:
+    italic 39px/1 Georgia,
+    serif;
+  color: #cd5135;
+}
+.projects-welcome p {
+  font-size: 12px;
+  line-height: 1.8;
+  max-width: 330px;
+  margin: 14px 0 20px;
+  color: #736c60;
+}
+.welcome-print {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.welcome-print:before {
+  content: "";
+  position: absolute;
+  width: 210px;
+  height: 210px;
+  border-radius: 50%;
+  background: #efc94d;
+}
+.welcome-print > span {
+  position: relative;
+  background: #f3ca55;
+  padding: 24px 28px;
+  width: 170px;
+  min-height: 200px;
+  transform: rotate(8deg);
+  box-shadow: 8px 12px 0 #59734622;
+  color: #191b17;
+  font-size: 9px;
+  line-height: 1.3;
+}
+.welcome-print b {
+  font-size: 30px;
+  display: block;
+  line-height: 0.95;
+  margin: 20px 0;
+}
+.welcome-print small {
+  font-size: 6px;
+  letter-spacing: 0.08em;
+}
+.project-counts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin: 20px 0 28px;
+}
+.project-counts > button {
+  background: #fffdf7;
+  border: 1px solid #ded5c6;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 17px;
+  cursor: pointer;
+  color: #3f5137;
+  text-align: left;
+}
+.project-counts strong {
+  font-size: 23px;
+  font-weight: 500;
+}
+.project-counts span {
+  font-size: 11px;
+  color: #736c60;
+}
+.project-counts svg:last-child {
+  margin-left: auto;
+}
+.projects-section-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+  margin: 0 0 18px;
+}
+.projects-section-head h2,
+.moro-projects .panel-title {
+  font-size: 20px;
+  letter-spacing: -0.6px;
+  font-weight: 500;
+  margin: 0 0 6px;
+}
+.projects-section-head p {
+  font-size: 12px;
+  color: #736c60;
+  margin: 0;
+}
+.projects-section-head > button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  border: 0;
+  background: transparent;
+  color: #191b17;
+  cursor: pointer;
+}
+.moro-projects .saved-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+.moro-projects .saved-card {
+  padding: 0;
+  border: 1px solid #ded5c6;
+  border-radius: 12px;
+  background: #fffdf7;
+  overflow: hidden;
+  min-width: 0;
+}
+.project-preview {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 1.25;
+  background: #f3e9d6;
+  border: 0;
+  cursor: pointer;
+  padding: 30px;
+}
+.project-artwork {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  height: auto;
+  width: 100%;
+  overflow: hidden;
+}
+.project-preview > .project-artwork {
+  width: 75%;
+  height: 100%;
+  filter: drop-shadow(0 9px 7px #1c2e1b18);
+}
+.project-preview > span {
+  position: absolute;
+  inset: auto 12px 12px;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  background: #fffaf1ef;
+  border-radius: 5px;
+  padding: 9px;
+  opacity: 0;
+  transition: opacity 0.15s;
+  font-size: 11px;
+}
+.project-preview:hover > span,
+.project-preview:focus-visible > span {
+  opacity: 1;
+}
+.project-card-copy {
+  padding: 17px;
+}
+.moro-projects .tag {
+  background: transparent;
+  color: #69715e;
+  padding: 0;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 0;
+}
+.moro-projects .saved-card h3 {
+  font-size: 15px;
+  margin: 8px 0;
+  font-weight: 500;
+  letter-spacing: -0.3px;
+  overflow-wrap: anywhere;
+}
+.moro-projects .editor-caption {
+  font-size: 10px;
+  color: #747b6c;
+  line-height: 1.7;
+}
+.project-open {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  font-size: 11px;
+  color: #191b17;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid #e5dac8;
+  padding: 13px 0 0;
+  margin-top: 15px;
+  cursor: pointer;
+}
+.projects-how {
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  margin-top: 30px;
+  border-top: 1px solid #ded5c6;
+  padding: 22px 0;
+  color: #9b6a49;
+  font-size: 10px;
+}
+.projects-how b {
+  font-weight: 400;
+  color: #69745e;
+  margin-left: 8px;
+}
+.project-search {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: #fffdf7;
+  border: 1px solid #ded5c6;
+  border-radius: 8px;
+  padding: 0 12px;
+}
+.moro-projects .project-search input {
+  border: 0;
+  background: transparent;
+  font-size: 11px;
+  padding: 10px 0;
+  margin: 0;
+  width: 165px;
+}
+.proof-callout {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #faf0dc;
+  border: 1px solid #e5d4af;
+  border-radius: 10px;
+  padding: 18px;
+  margin-bottom: 26px;
+  font-size: 12px;
+  color: #705726;
+}
+.proof-callout p {
+  margin: 5px 0 0;
+  font-size: 11px;
+}
+.proof-callout > .button {
+  margin-left: auto;
+}
+.moro-projects .empty-state {
+  background: #fffdf7;
+  border: 1px dashed #cdd5c1;
+  border-radius: 12px;
+  padding: 45px 25px;
+  min-height: 220px;
+}
+.moro-projects .empty-state h2,
+.moro-projects .empty-state h3 {
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.5px;
+}
+.moro-projects .empty-state p {
+  font-size: 12px;
+  max-width: 430px;
+  line-height: 1.8;
+}
+.moro-projects .order-card {
+  border: 1px solid #ded5c6;
+  background: #fffdf7;
+  border-radius: 12px;
+  padding: 22px;
+  box-shadow: none;
+  margin-top: 16px;
+}
+.moro-projects .order-head h3 {
+  font-size: 16px;
+  letter-spacing: -0.3px;
+  font-weight: 500;
+}
+.moro-projects .order-head small,
+.moro-projects .order-card p {
+  font-size: 11px;
+  color: #736c60;
+}
+.moro-projects .order-actions {
+  gap: 8px;
+}
+.moro-projects .order-actions .button {
+  font-size: 11px;
+  min-height: 34px;
+  padding: 8px 12px;
+}
+.moro-projects .pipeline {
+  border: 0;
+  background: #eceee3;
+  border-radius: 7px;
+  padding: 10px;
+}
+.moro-projects .pipeline span {
+  font-size: 10px;
+  color: #7c8572;
+}
+.moro-projects .pipeline .done,
+.moro-projects .pipeline .active {
+  color: #191b17;
+}
+.moro-projects .notice {
+  background: #f6ead2;
+  border: 0;
+  color: #191b17;
+  border-radius: 8px;
+  font-size: 12px;
+  margin: 0 40px 20px;
+  padding: 12px 18px;
+}
+.moro-projects .filter-row {
+  padding: 12px;
+  background: #f7efdf;
+  border: 0;
+  border-radius: 8px;
+  margin-top: 20px;
+  gap: 10px;
+}
+.moro-projects .filter-row input,
+.moro-projects .filter-row select {
+  font-size: 11px;
+  min-height: 36px;
+}
+.moro-projects .projects-content > form {
+  max-width: 520px;
+  background: #fffdf7;
+  border: 1px solid #ded5c6;
+  border-radius: 12px;
+  padding: 25px;
+  margin-top: 20px;
+}
+.moro-projects .lead {
+  color: #736c60;
+}
+.moro-projects .stat {
+  background: #fffdf7;
+  border: 1px solid #ded5c6;
+  border-radius: 10px;
+}
+.moro-projects .stat strong {
+  font-size: 26px;
+}
+.moro-projects details summary {
+  font-size: 12px;
+}
+.moro-projects .order-preview-label {
+  font-size: 9px;
+}
+/* Studio: viewport-sized editor, independent of the storefront. */
+.focused-studio {
+  height: 100dvh;
+  min-height: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.focused-studio .studio-appbar {
+  height: 64px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 0 20px;
+  border-bottom: 1px solid #ded5c6;
+  background: #fffaf1;
+}
+.studio-back {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: #191b17;
+  text-decoration: none;
+}
+.studio-back > span {
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -1.7px;
+}
+.brand-dot {
+  color: #b84f34;
+}
+.studio-document {
+  display: flex;
+  flex-direction: column;
+  min-width: 100px;
+  max-width: 380px;
+  gap: 3px;
+  border-left: 1px solid #ded5c6;
+  padding-left: 18px;
+}
+.focused-studio .studio-document input {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  min-height: 22px;
+  border-radius: 3px;
+  font-size: 13px;
+  width: 100%;
+  font-weight: 500;
+}
+.studio-document > span {
+  font-size: 9px;
+  color: #756d5f;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.studio-app-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.studio-app-actions .studio-account-cta {
+  background: transparent;
+  border: 0;
+  font-size: 11px;
+  color: #191b17;
+  cursor: pointer;
+}
+.studio-save {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 13px;
+  background: #fffdf7;
+  border: 1px solid #ded5c6;
+  border-radius: 7px;
+  color: #191b17;
+  font-size: 11px;
+  cursor: pointer;
+}
+.focused-studio .studio-app-actions .button {
+  min-height: 36px;
+  font-size: 11px;
+  padding: 8px 15px;
+}
+.focused-studio .studio-layout {
+  display: grid;
+  grid-template-columns: 68px 255px minmax(0, 1fr);
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  overflow: hidden;
+}
+.studio-toolrail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 6px;
+  background: #fffaf1;
+  border-right: 1px solid #ded5c6;
+  overflow: auto;
+}
+.studio-toolrail > button {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  align-items: center;
+  justify-content: center;
+  width: 55px;
+  min-height: 59px;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  color: #736c60;
+  font-size: 9px;
+  cursor: pointer;
+  padding: 8px 2px;
+}
+.studio-toolrail > button[aria-pressed="true"] {
+  background: #191b17;
+  color: #191b17;
+}
+.toolrail-divider {
+  width: 30px;
+  border-top: 1px solid #ded5c6;
+  margin: 3px;
+}
+.focused-studio .studio-panel {
+  overflow: auto;
+  overscroll-behavior: contain;
+  background: #fffdf7;
+  border-right: 1px solid #ded5c6;
+  border-top: 0;
+  padding: 20px 18px;
+  min-height: 0;
+  scrollbar-width: thin;
+}
+.focused-studio .studio-panel-tabs {
+  margin-bottom: 22px;
+}
+.focused-studio .studio-panel h2 {
+  font-size: 16px;
+  margin: 0 0 15px;
+  font-weight: 500;
+  letter-spacing: -0.3px;
+}
+.focused-studio .studio-panel label {
+  font-size: 11px;
+  margin-bottom: 15px;
+}
+.focused-studio .studio-panel input,
+.focused-studio .studio-panel select {
+  min-height: 35px;
+}
+.focused-studio .studio-panel > .button {
+  margin-bottom: 18px;
+}
+.focused-studio .studio-workspace {
+  padding: 15px 24px 10px;
+  min-height: 0;
+  overflow: auto;
+  gap: 12px;
+  position: relative;
+  order: initial;
+}
+.focused-studio .workspace-toolbar {
+  width: auto;
+  max-width: 100%;
+  padding: 3px 9px;
+  flex-shrink: 0;
+  min-height: 36px;
+  margin: 0 auto;
+  box-shadow: 0 2px 5px #26392008;
+}
+.focused-studio .workspace-toolbar button {
+  font-size: 10px;
+  padding: 7px 9px;
+  min-height: 30px;
+}
+.focused-studio .studio-zoom {
+  position: absolute;
+  bottom: 13px;
+  right: 18px;
+  z-index: 1;
+  background: #fffdf7;
+  border: 1px solid #ded5c6;
+  border-radius: 6px;
+  padding: 3px 5px;
+  align-self: auto;
+}
+.focused-studio .canvas-frame {
+  min-height: 0;
+  width: 100%;
+  flex: 1;
+  overflow: auto;
+  padding: 25px 20px;
+  align-items: center;
+  justify-content: center;
+}
+.focused-studio .artboard {
+  flex-shrink: 0;
+  box-shadow: 0 8px 22px #1b2d1c25;
+  max-height: 65dvh !important;
+}
+.focused-studio .canvas-note {
+  font-size: 8px;
+  flex-shrink: 0;
+  letter-spacing: 0.05em;
+  margin-bottom: 0;
+}
+.focused-studio .studio-workspace > .editor-caption {
+  font-size: 10px;
+  margin: 0 0 35px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.studio-statusbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  font-size: 9px;
+  color: #756d5f;
+  background: #fffaf1;
+  border-top: 1px solid #ded5c6;
+  padding: 8px 20px 18px;
+  flex-shrink: 0;
+  min-height: 42px;
+}
+.focused-studio > .notice {
+  position: absolute;
+  top: 72px;
+  left: calc(50% + 100px);
+  transform: translateX(-50%);
+  z-index: 3;
+  font-size: 11px;
+  box-shadow: 0 5px 18px #24351d20;
+  padding: 11px 18px;
+  max-width: 420px;
+  margin: 0;
+  background: #fffdf7;
+  border: 1px solid #ded5c6;
+}
+.focused-studio .studio-summary[hidden] {
+  display: none !important;
+}
+.focused-studio .studio-summary {
+  position: fixed;
+  z-index: 5;
+  right: 12px;
+  top: 72px;
+  bottom: 48px;
+  display: block;
+  width: 300px;
+  overflow: auto;
+  border: 1px solid #ded5c6;
+  border-radius: 12px;
+  padding: 22px;
+  box-shadow: 0 12px 50px #20311d30;
+  background: #fffdf7;
+}
+.order-panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e5dac8;
+  margin-bottom: 20px;
+}
+.order-panel-heading h2 {
+  font-size: 15px !important;
+}
+.focused-studio .summary-main {
+  width: auto;
+}
+.focused-studio .summary-title {
+  margin: 0 0 20px;
+}
+.focused-studio .summary-title h2 {
+  font-size: 16px;
+}
+.focused-studio .summary-title > svg {
+  display: none;
+}
+.focused-studio .studio-summary .notice {
+  font-size: 9px;
+}
+.layer-position {
+  border-block: 1px solid #e5dac8;
+  margin: 15px 0;
+  padding: 12px 0;
+}
+.layer-position summary {
+  font-size: 11px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+.layer-quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.layer-quick-actions button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: #f6ebd7;
+  border: 0;
+  color: #55664a;
+  font-size: 10px;
+  padding: 8px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.focused-studio .layer-list {
+  gap: 6px;
+  margin-bottom: 20px;
+}
+.focused-studio .layer-list button {
+  border: 1px solid #ded5c6;
+  background: #fcf5e7;
+  color: #66765c;
+  border-radius: 6px;
+  padding: 11px;
+  text-align: left;
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.focused-studio .layer-list button.selected {
+  border-color: #c4935d;
+  background: #f5ead7;
+  color: #191b17;
+}
+.focused-studio .template-preview {
+  background: #f5ecdb;
+  padding: 14px;
+  border: 1px solid #ded5c6;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  width: 100%;
+  margin-bottom: 14px;
+  max-height: 230px;
+}
+.template-preview svg {
+  max-height: 180px;
+  max-width: 90%;
+}
+.template-preview span {
+  font-size: 11px;
+}
+.studio-starting-point {
+  padding: 10px;
+  background: #f5ecdb;
+  border-radius: 8px;
+}
+.studio-starting-point svg {
+  height: 180px;
+  margin-bottom: 15px;
+}
+.studio-starting-point p {
+  padding: 8px;
+}
+.guest-save-nudge {
+  position: fixed;
+  z-index: 6;
+  bottom: 68px;
+  left: calc(50% + 120px);
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fffaf1;
+  border: 1px solid #ded5c6;
+  border-radius: 12px;
+  padding: 14px 12px;
+  box-shadow: 0 8px 35px #1e301c22;
+  max-width: calc(100vw - 35px);
+  width: 530px;
+}
+.guest-save-nudge .nudge-symbol {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  background: #f3e6cc;
+  border-radius: 8px;
+  color: #191b17;
+  flex-shrink: 0;
+}
+.guest-save-nudge strong {
+  font-size: 12px;
+  font-weight: 500;
+}
+.guest-save-nudge p {
+  font-size: 10px;
+  color: #717b65;
+  margin: 4px 0 0;
+  line-height: 1.5;
+}
+.guest-save-nudge > button:not(.icon-button) {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  border: 0;
+  white-space: nowrap;
+  background: #191b17;
+  color: #fffaf1;
+  font-size: 10px;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-left: auto;
+}
+.guest-save-nudge > .icon-button {
+  padding: 4px;
+  min-width: 24px;
+  min-height: 24px;
+}
+.focused-studio svg g[role="button"]:focus-visible {
+  outline: 2px solid #b14c30;
+  outline-offset: 4px;
+}
+@media (min-width: 1700px) {
+  .focused-studio .studio-layout {
+    grid-template-columns: 74px 290px minmax(0, 1fr);
+  }
+  .focused-studio .artboard {
+    max-width: 580px !important;
+  }
+  .moro-projects .saved-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 1050px) {
+  .moro-projects .dashboard-grid {
+    grid-template-columns: 150px minmax(0, 1fr);
+    gap: 20px;
+    padding: 0 24px;
+  }
+  .moro-projects .dashboard-top,
+  .projects-appbar {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+  .projects-welcome {
+    padding: 25px;
+    grid-template-columns: 1.2fr 0.8fr;
+  }
+  .projects-welcome h2 {
+    font-size: 30px;
+  }
+  .projects-welcome h2 em {
+    font-size: 32px;
+  }
+  .welcome-print > span {
+    width: 140px;
+    min-height: 180px;
+    padding: 20px;
+  }
+  .welcome-print:before {
+    width: 170px;
+    height: 170px;
+  }
+  .moro-projects .saved-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .project-counts > button {
+    padding: 12px;
+    gap: 7px;
+    flex-wrap: wrap;
+  }
+  .project-counts > button > svg:first-child {
+    display: none;
+  }
+  .project-counts > button > span {
+    font-size: 10px;
+  }
+  .projects-how {
+    flex-wrap: wrap;
+  }
+  .focused-studio .studio-layout {
+    grid-template-columns: 62px 235px minmax(0, 1fr);
+  }
+  .studio-document {
+    max-width: 280px;
+  }
+  .studio-app-actions .studio-account-cta {
+    display: none;
+  }
+  .focused-studio .studio-workspace {
+    padding: 12px;
+  }
+  .focused-studio .canvas-note {
+    font-size: 7px;
+  }
+  .guest-save-nudge {
+    left: auto;
+    right: 20px;
+    transform: none;
+    width: 460px;
+  }
+  .skeleton-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .skeleton-cards > i:last-child {
+    display: none;
+  }
+}
+@media (max-width: 700px) {
+  .projects-appbar {
+    height: 60px;
+    padding: 0 20px;
+    gap: 15px;
+  }
+  .workspace-purpose {
+    font-size: 9px;
+    padding-left: 15px;
+  }
+  .projects-appbar > div {
+    gap: 12px;
+  }
+  .projects-appbar > div > a {
+    display: none;
+  }
+  .projects-appbar .moro-logo {
+    font-size: 27px;
+  }
+  .moro-projects .dashboard-top {
+    padding: 24px 20px;
+    align-items: center;
+    gap: 12px;
+  }
+  .moro-projects .page-title {
+    font-size: 30px;
+  }
+  .projects-description {
+    font-size: 11px;
+    line-height: 1.6;
+    max-width: 250px;
+  }
+  .moro-projects .dashboard-top > .button {
+    font-size: 0;
+    width: 36px;
+    height: 36px;
+    min-height: 36px;
+    padding: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .moro-projects .dashboard-top > .button > svg {
+    width: 20px;
+    height: 20px;
+  }
+  .moro-projects .dashboard-grid {
+    display: flex;
+    flex-direction: column;
+    padding: 0 16px;
+    gap: 22px;
+  }
+  .moro-projects .dashboard-side {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow: auto;
+    position: static;
+    width: 100%;
+    border-block: 1px solid #ded5c6;
+    padding: 6px 0;
+    border-radius: 0;
+    gap: 5px;
+    white-space: nowrap;
+    scrollbar-width: none;
+  }
+  .moro-projects .dashboard-side > button {
+    font-size: 10px;
+    padding: 10px;
+    gap: 6px;
+    min-height: 36px;
+    margin: 0;
+    flex-shrink: 0;
+  }
+  .moro-projects .dashboard-side > button:nth-last-of-type(1),
+  .moro-projects .dashboard-side > form {
+    display: none;
+  }
+  .moro-projects .dashboard-side > button svg {
+    width: 14px;
+    height: 14px;
+  }
+  .projects-welcome {
+    padding: 23px 20px;
+    gap: 0;
+    grid-template-columns: 1fr 110px;
+  }
+  .projects-welcome h2 {
+    font-size: 25px;
+    letter-spacing: -0.8px;
+  }
+  .projects-welcome h2 em {
+    font-size: 27px;
+  }
+  .projects-welcome .eyebrow {
+    font-size: 8px;
+  }
+  .projects-welcome p {
+    font-size: 10px;
+  }
+  .projects-welcome .button {
+    font-size: 10px;
+    padding: 9px 12px;
+    min-height: 35px;
+  }
+  .welcome-print > span {
+    width: 100px;
+    min-height: 145px;
+    padding: 14px;
+    font-size: 6px;
+  }
+  .welcome-print b {
+    font-size: 23px;
+    margin: 18px 0;
+  }
+  .welcome-print small {
+    font-size: 4px;
+  }
+  .welcome-print:before {
+    width: 115px;
+    height: 145px;
+  }
+  .project-counts {
+    gap: 7px;
+    margin: 14px 0 25px;
+  }
+  .project-counts > button {
+    padding: 12px 9px;
+    gap: 4px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .project-counts > button > svg:last-child {
+    display: none;
+  }
+  .project-counts strong {
+    font-size: 22px;
+  }
+  .project-counts span {
+    font-size: 9px !important;
+  }
+  .projects-section-head {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .projects-section-head h2 {
+    font-size: 18px;
+  }
+  .moro-projects .saved-grid {
+    gap: 12px;
+  }
+  .project-preview {
+    padding: 15px;
+  }
+  .project-card-copy {
+    padding: 13px;
+  }
+  .moro-projects .saved-card h3 {
+    font-size: 13px;
+  }
+  .moro-projects .tag {
+    font-size: 8px;
+  }
+  .moro-projects .saved-card .editor-caption {
+    font-size: 9px;
+  }
+  .project-open {
+    font-size: 10px;
+  }
+  .projects-how {
+    gap: 15px;
+    font-size: 9px;
+  }
+  .proof-callout {
+    flex-wrap: wrap;
+    padding: 14px;
+  }
+  .proof-callout > .button {
+    margin-left: 0;
+  }
+  .moro-projects .filter-row {
+    flex-wrap: wrap;
+  }
+  .moro-projects .order-card {
+    padding: 16px;
+  }
+  .moro-projects .order-head {
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .moro-projects .pipeline {
+    padding: 8px;
+    gap: 5px;
+  }
+  .moro-projects .pipeline span {
+    font-size: 8px;
+  }
+  .moro-projects .notice {
+    margin: 0 16px 15px;
+  }
+  .moro-projects .projects-content > form {
+    padding: 18px;
+  }
+  .skeleton-appbar {
+    height: 60px;
+    padding: 0 18px;
+    gap: 18px;
+  }
+  .skeleton-appbar i:nth-child(2) {
+    width: 100px;
+  }
+  .skeleton-appbar i:last-child {
+    width: 70px;
+  }
+  .skeleton-body {
+    display: flex;
+    flex-direction: column;
+  }
+  .skeleton-body > aside {
+    flex-direction: row;
+    gap: 12px;
+    padding: 18px;
+    border: 0;
+  }
+  .skeleton-body > aside i {
+    height: 30px;
+    width: 80px;
+  }
+  .skeleton-body > aside i:last-child {
+    display: none;
+  }
+  .skeleton-content {
+    padding: 18px;
+    gap: 18px;
+  }
+  .skeleton-cards i {
+    height: 180px;
+  }
+  .skeleton-studio .skeleton-body {
+    flex: 1;
+  }
+  .skeleton-studio .skeleton-art {
+    width: 80%;
+    margin: 35px auto;
+  }
+  .skeleton-studio .skeleton-content {
+    padding: 12px;
+  }
+  .auth-skeleton {
+    display: block;
+    padding: 30px;
+  }
+  .auth-skeleton > div {
+    height: 160px;
+  }
+  .auth-skeleton section {
+    padding-top: 30px;
+  }
+  .auth-appbar {
+    height: 60px;
+    padding: 0 20px;
+  }
+  .auth-appbar .moro-logo {
+    font-size: 27px;
+  }
+  .auth-appbar > a:last-child {
+    font-size: 10px;
+  }
+  .moro-public .moro-auth {
+    padding-top: 15px;
+    min-height: calc(100dvh - 60px);
+  }
+  .focused-studio .studio-appbar {
+    height: 61px;
+    padding: 0 12px;
+    gap: 10px;
+  }
+  .studio-back > span {
+    font-size: 22px;
+  }
+  .studio-back {
+    gap: 7px;
+  }
+  .studio-back > svg {
+    width: 15px;
+  }
+  .studio-document {
+    padding-left: 10px;
+    max-width: 170px;
+    min-width: 0;
+  }
+  .focused-studio .studio-document input {
+    font-size: 11px;
+  }
+  .studio-document > span {
+    font-size: 8px;
+  }
+  .studio-app-actions {
+    gap: 6px;
+  }
+  .studio-save {
+    padding: 7px;
+    min-height: 32px;
+  }
+  .studio-save > span {
+    display: none;
+  }
+  .focused-studio .studio-app-actions .button {
+    font-size: 10px;
+    min-height: 32px;
+    padding: 7px 10px;
+    gap: 3px;
+  }
+  .focused-studio .studio-app-actions .button > svg {
+    display: none;
+  }
+  .focused-studio .studio-layout {
+    position: relative;
+    display: grid;
+    grid-template-columns: 52px minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) 240px;
+  }
+  .studio-toolrail {
+    grid-column: 1;
+    grid-row: 1/3;
+    padding: 10px 3px;
+    gap: 4px;
+  }
+  .studio-toolrail > button {
+    width: 44px;
+    min-height: 51px;
+    font-size: 8px;
+    gap: 6px;
+  }
+  .studio-toolrail > button svg {
+    width: 18px;
+    height: 18px;
+  }
+  .focused-studio .studio-workspace {
+    grid-column: 2;
+    grid-row: 1;
+    order: initial;
+    padding: 8px 10px;
+    gap: 7px;
+    overflow: hidden;
+  }
+  .focused-studio .studio-panel {
+    grid-column: 2;
+    grid-row: 2;
+    order: initial;
+    border-top: 1px solid #ded5c6;
+    padding: 15px;
+    border-right: 0;
+  }
+  .focused-studio .studio-panel .field-row {
+    grid-template-columns: 1fr 1fr;
+  }
+  .focused-studio .studio-panel .tabs {
+    margin-bottom: 15px;
+  }
+  .focused-studio .studio-panel label {
+    font-size: 10px;
+    margin-bottom: 12px;
+  }
+  .focused-studio .studio-panel .editor-caption {
+    font-size: 10px;
+  }
+  .focused-studio .canvas-frame {
+    padding: 12px 7px;
+    min-height: 0;
+  }
+  .focused-studio .artboard {
+    max-width: min(85%, 260px) !important;
+    max-height: 29dvh !important;
+  }
+  .focused-studio .workspace-toolbar {
+    gap: 0;
+    padding: 2px 5px;
+    flex-wrap: nowrap;
+    width: auto;
+    min-height: 29px;
+  }
+  .focused-studio .workspace-toolbar button {
+    font-size: 9px;
+    padding: 5px;
+    gap: 4px;
+    min-height: 25px;
+  }
+  .focused-studio .workspace-toolbar button:nth-child(2) {
+    display: none;
+  }
+  .focused-studio .workspace-toolbar button > svg {
+    width: 12px;
+    height: 12px;
+  }
+  .focused-studio .studio-zoom {
+    bottom: 7px;
+    right: 8px;
+    font-size: 0;
+    gap: 0;
+    padding: 0;
+  }
+  .focused-studio .studio-zoom select {
+    font-size: 9px;
+    min-height: 23px;
+    width: 60px;
+    border: 0;
+  }
+  .focused-studio .canvas-note {
+    display: none;
+  }
+  .focused-studio .studio-workspace > .editor-caption {
+    display: none;
+  }
+  .studio-statusbar {
+    font-size: 8px;
+    padding: 7px 12px 18px;
+    min-height: 38px;
+    gap: 10px;
+  }
+  .studio-statusbar > span:last-child {
+    max-width: 140px;
+    text-align: right;
+  }
+  .focused-studio .studio-summary {
+    width: calc(100% - 24px);
+    top: 69px;
+    bottom: 45px;
+    right: 12px;
+    padding: 22px;
+    z-index: 9;
+  }
+  .guest-save-nudge {
+    bottom: 50px;
+    right: 10px;
+    width: calc(100% - 20px);
+    gap: 9px;
+    padding: 11px;
+  }
+  .guest-save-nudge .nudge-symbol {
+    display: none;
+  }
+  .guest-save-nudge strong {
+    font-size: 11px;
+  }
+  .guest-save-nudge p {
+    font-size: 9px;
+    max-width: 180px;
+  }
+  .guest-save-nudge > button:not(.icon-button) {
+    font-size: 9px;
+    padding: 9px;
+  }
+  .focused-studio > .notice {
+    left: 60px;
+    right: 10px;
+    transform: none;
+    top: 68px;
+    max-width: calc(100% - 70px);
+    padding: 9px 12px;
+    font-size: 10px;
+  }
+  .layer-quick-actions button {
+    font-size: 9px;
+  }
+  .workspace-disclosure {
+    font-size: 8px;
+    bottom: 4px;
+    right: 10px;
+  }
+}
+@media (max-width: 360px) {
+  .studio-document {
+    max-width: 100px;
+  }
+  .projects-welcome {
+    grid-template-columns: 1fr;
+  }
+  .welcome-print {
+    display: none;
+  }
+  .moro-projects .saved-grid {
+    grid-template-columns: 1fr;
+  }
+  .studio-back > span {
+    display: none;
+  }
+  .project-counts span {
+    font-size: 8px !important;
+  }
+}
+.focused-studio .order-drawer {
+  position: fixed;
+  inset: 0 0 0 auto;
+  margin: 0;
+  width: 340px;
+  max-width: 100%;
+  height: 100dvh;
+  max-height: 100dvh;
+  border-radius: 0;
+  border: 0;
+  border-left: 1px solid #ded5c6;
+  padding: 0;
+  background: #fffdf7;
+}
+.focused-studio .order-drawer .studio-summary {
+  position: static;
+  display: block;
+  width: auto;
+  max-width: none;
+  height: auto;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 25px;
+}
+.order-drawer::backdrop {
+  background: #1d2d1e45;
+  backdrop-filter: blur(2px);
+}
+@media (max-width: 700px) {
+  .focused-studio .order-drawer {
+    width: min(390px, 100%);
+  }
+  .focused-studio .order-drawer .studio-summary {
+    padding: 23px;
+  }
+}
+.moro-projects .dashboard-grid {
+  margin-top: 0;
+}
+.moro-projects .dashboard-side {
+  gap: 0;
+}
+.moro-projects .projects-welcome {
+  padding: 25px 30px;
+}
+.projects-welcome h2 {
+  font-size: 32px;
+  margin: 12px 0;
+}
+.projects-welcome h2 em {
+  font-size: 35px;
+}
+.projects-welcome p {
+  margin: 10px 0 16px;
+}
+.moro-projects .progress {
+  height: 5px;
+  gap: 5px;
+  margin: 18px 0;
+}
+.moro-projects .progress span {
+  background: #e4e8da;
+  border-radius: 5px;
+}
+.moro-projects .progress span.done {
+  background: #618056;
+}
+.moro-projects .badge {
+  font:
+    10px "DM Sans",
+    sans-serif;
+  padding: 7px 10px;
+  background: #f5e8cf;
+  color: #395a2b;
+  border: 0;
+  border-radius: 6px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.moro-projects .badge.orange {
+  background: #f5e9d2;
+  color: #826223;
+}
+.moro-projects .profile-signout {
+  border: 0 !important;
+  background: transparent !important;
+  padding: 0 !important;
+  margin-top: 20px !important;
+}
+.focused-studio .studio-panel > .text-link {
+  font-size: 10px;
+}
+.focused-studio .studio-panel h2 {
+  margin-bottom: 20px;
+}
+@media (max-width: 700px) {
+  .moro-projects .projects-welcome {
+    padding: 21px 18px;
+  }
+  .projects-welcome h2 {
+    font-size: 25px;
+  }
+  .projects-welcome h2 em {
+    font-size: 27px;
+  }
+}
+.focused-studio .artboard {
+  height: auto;
+  max-height: none !important;
+}
+@media (max-width: 700px) {
+  .focused-studio .artboard {
+    max-width: min(
+      85%,
+      260px,
+      calc(29dvh * var(--artwork-ratio, 1))
+    ) !important;
+    max-height: none !important;
+  }
+}
+.account-nav-skeleton {
+  width: 75px;
+  height: 12px;
+  display: inline-block;
+  vertical-align: middle;
+}
+.proof-image-stage {
+  position: relative;
+  margin: 20px 0;
+  min-height: 180px;
+  max-height: 55dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eff0e5;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.proof-image-stage .proof-image {
+  width: 100%;
+  height: 100%;
+  max-height: 55dvh;
+  object-fit: contain;
+  margin: 0;
+}
+.proof-image-skeleton {
+  position: absolute;
+  inset: 0;
+}
+.proof-image-error {
+  padding: 25px;
+  text-align: center;
+  font-size: 12px;
+}
+.studio-dialog .button {
+  border-radius: 999px;
+  background: #191b17;
+  color: #fffaf1;
+  border: 1px solid #191b17;
+  font-family: "DM Sans", sans-serif;
+  font-size: 12px;
+  padding: 11px 17px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.studio-dialog .button.outline {
+  color: #191b17;
+  background: transparent;
+  border-color: #b8c6ae;
+}
+.studio-dialog input,
+.studio-dialog select,
+.studio-dialog textarea {
+  font:
+    12px "DM Sans",
+    sans-serif;
+  border: 1px solid #d7dfcc;
+  border-radius: 7px;
+  background: #fffdf8;
+  padding: 10px 12px;
+}
+.studio-dialog .form-message {
+  font-size: 12px;
+}
+.studio-dialog .editor-caption {
+  font-size: 11px;
+  line-height: 1.7;
+  color: #6c765e;
+}
+@media (max-width: 760px) {
+  .moro-public .moro-auth .auth-story {
+    display: none;
+  }
+  .moro-public .moro-auth {
+    display: block;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 14px 24px 45px;
+    min-height: calc(100dvh - 60px);
+  }
+  .moro-public .moro-auth .auth-form {
+    padding: 24px 0;
+  }
+  .auth-skeleton > div {
+    display: none;
+  }
+  .auth-skeleton section {
+    padding-top: 10px;
+  }
+}
+.focused-studio .canvas-frame {
+  display: grid;
+  place-items: safe center;
+  overflow: auto;
+}
+.focused-studio .artboard {
+  max-width: none !important;
+  max-height: none !important;
+}
+.orientation-controls {
+  display: flex;
+  gap: 7px;
+  margin: 0 0 16px;
+}
+.orientation-controls > button {
+  flex: 1;
+  border: 1px solid #ddd4c6;
+  background: #fffdf7;
+  border-radius: 6px;
+  font-size: 11px;
+  padding: 9px;
+  cursor: pointer;
+}
+.orientation-controls > button[aria-pressed="true"] {
+  background: #24231f;
+  color: #fffaf1;
+  border-color: #24231f;
+}
+/* The same paper, ink, poster art and hand-drawn accents as the storefront. */
+.moro-app .moro-logo {
+  font-weight: 700;
+  letter-spacing: -1.7px;
+}
+.moro-projects .page-title {
+  font-size: 40px;
+  font-weight: 500;
+  letter-spacing: -1.8px;
+}
+.moro-projects .projects-description {
+  font-size: 13px;
+}
+.moro-projects .dashboard-side button {
+  font-size: 13px;
+}
+.moro-projects .dashboard-side button.selected {
+  color: #191b17;
+  background: #f2e2c6;
+}
+.moro-projects .saved-card h3 {
+  font-size: 16px;
+}
+.moro-projects .tag {
+  color: #9e492c;
+}
+.moro-projects .project-open {
+  font-size: 12px;
+  color: #191b17;
+}
+.moro-projects .project-preview {
+  background: #f3e9d6;
+}
+.moro-projects .project-preview:hover {
+  background: #f1dfbd;
+}
+.moro-projects .project-counts > button {
+  color: #2d2a24;
+  background: #fffdf7;
+  border-color: #ded5c6;
+}
+.moro-projects .project-counts strong {
+  font-size: 25px;
+}
+.moro-projects .project-counts span {
+  font-size: 12px;
+  color: #736c60;
+}
+.moro-projects .projects-welcome {
+  background: #f8ecd9;
+  border-color: #e7d8bf;
+}
+.welcome-print:before {
+  display: none;
+}
+.welcome-orbit {
+  position: absolute;
+  width: 225px;
+  height: 225px;
+  background: #f1cf64;
+  border-radius: 50%;
+}
+.welcome-poster {
+  height: 215px;
+  width: 170px;
+  transform: rotate(8deg);
+  box-shadow: 0 12px 18px #37230e20;
+  position: relative;
+  overflow: hidden;
+}
+.welcome-poster > .print-poster {
+  width: 100%;
+  height: 100%;
+}
+.welcome-flower {
+  position: absolute;
+  left: 8%;
+  top: 2%;
+  z-index: 1;
+  transform: rotate(-14deg);
+}
+.welcome-ribbon {
+  position: absolute;
+  bottom: 0;
+  right: 4%;
+  transform: rotate(20deg);
+}
+.focused-studio {
+  --ink: #191b17;
+  --muted: #736c60;
+  --line: #ded5c6;
+  --accent: #191b17;
+  background: #fffaf1;
+}
+.focused-studio .studio-workspace {
+  background-color: #f4ebdb;
+  background-image: radial-gradient(#d4c3a7 0.8px, transparent 0.8px);
+  background-size: 18px 18px;
+}
+.focused-studio .studio-toolrail > button[aria-pressed="true"] {
+  color: #fffaf1;
+  background: #191b17;
+}
+.focused-studio .studio-panel {
+  background: #fffdf7;
+}
+.focused-studio .studio-panel label {
+  color: #625a4d;
+}
+.focused-studio .studio-panel .editor-caption {
+  color: #736c60;
+}
+.focused-studio .workspace-toolbar {
+  background: #fffdf7;
+  border-color: #ded5c6;
+}
+.focused-studio .workspace-toolbar button {
+  color: #191b17;
+}
+.focused-studio .workspace-toolbar button:hover {
+  background: #f5e8d1;
+}
+.focused-studio .layer-list button.selected {
+  color: #191b17;
+  background: #f6e6cb;
+  border-color: #c49b67;
+}
+.focused-studio .studio-app-actions .button,
+.focused-studio .button,
+.moro-projects .button {
+  background: #191b17;
+  border-color: #191b17;
+  color: #fffaf1;
+}
+.focused-studio .button.outline,
+.moro-projects .button.outline {
+  background: transparent;
+  color: #191b17;
+  border-color: #cbbda5;
+}
+.focused-studio .artboard [role="button"]:focus-visible {
+  outline-color: #2f54b8;
+}
+.moro-app :focus-visible {
+  outline-color: #2f54b8;
+}
+.moro-app .profile-avatar {
+  background: #f0c64f;
+  color: #191b17;
+}
+.focused-studio .studio-summary {
+  background: #fffaf1;
+}
+.focused-studio .discount {
+  background: #f5e6c6;
+  color: #6b4c24;
+}
+.focused-studio .text-link {
+  color: #29251f;
+}
+.focused-studio .studio-back {
+  color: #191b17;
+}
+@media (max-width: 1050px) {
+  .welcome-poster {
+    height: 185px;
+    width: 146px;
+  }
+  .welcome-orbit {
+    width: 185px;
+    height: 185px;
+  }
+  .welcome-flower {
+    left: -5%;
+    width: 55px;
+  }
+  .welcome-ribbon {
+    right: -5%;
+    width: 45px;
+  }
+}
+@media (max-width: 700px) {
+  .moro-projects .page-title {
+    font-size: 32px;
+  }
+  .moro-projects .projects-description {
+    font-size: 12px;
+  }
+  .moro-projects .dashboard-side button {
+    font-size: 11px;
+  }
+  .welcome-poster {
+    height: 137px;
+    width: 100px;
+  }
+  .welcome-orbit {
+    width: 125px;
+    height: 145px;
+  }
+  .welcome-flower {
+    width: 36px;
+    left: -16px;
+    top: 0;
+  }
+  .welcome-ribbon {
+    width: 32px;
+    right: -15px;
+    bottom: 10px;
+  }
+  .moro-projects .project-counts span {
+    font-size: 10px;
+  }
+  .moro-projects .saved-card h3 {
+    font-size: 14px;
+  }
+  .focused-studio .studio-toolrail > button {
+    font-size: 9px;
+  }
+}
+.focused-studio > .notice {
+  top: auto;
+  bottom: 84px;
+  left: auto;
+  right: 22px;
+  transform: none;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  max-width: 380px;
+  background: #fffaf1;
+  border-color: #d8c4a5;
+}
+.notification-dismiss {
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: #756d5f;
+  cursor: pointer;
+  padding: 4px;
+  flex-shrink: 0;
+}
+.welcome-poster > .poster-face {
+  width: 100%;
+  height: 100%;
+}
+@media (max-width: 700px) {
+  .focused-studio > .notice {
+    top: auto;
+    bottom: 285px;
+    left: 62px;
+    right: 12px;
+    max-width: none;
+  }
+  .orientation-controls > button {
+    font-size: 10px;
+    padding: 8px 5px;
+  }
+}
+.resize-handle {
+  cursor: nwse-resize;
+  touch-action: none;
+  vector-effect: non-scaling-stroke;
+}
+.focused-studio .resize-handle:focus-visible {
+  outline: none;
+  stroke: #cf5033;
+  stroke-width: 5;
+}
+.focused-studio .studio-layout,
+.focused-studio .studio-workspace,
+.focused-studio .canvas-frame {
+  min-width: 0;
+  min-height: 0;
+}
+.focused-studio .canvas-frame {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* Direct manipulation and action feedback. */
+.studio-layer-properties {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.studio-layer-properties:disabled {
+  opacity: 0.55;
+}
+.layer-list .studio-layer-row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  border: 1px solid #dedbd2;
+  border-radius: 8px;
+  background: #fffdf8;
+  padding: 3px;
+}
+.layer-list .studio-layer-row.selected {
+  border-color: #2f54b8;
+  background: #eef1fb;
+}
+.layer-list .studio-layer-row > button {
+  padding: 7px;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  width: auto;
+  min-height: 34px;
+}
+.layer-list .studio-layer-select {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+.studio-layer-select > span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.studio-layer-row.is-hidden .studio-layer-select {
+  opacity: 0.45;
+}
+.studio-layer-row button[aria-pressed="true"]:not(.studio-layer-select) {
+  color: #2f54b8;
+  background: #dce4ff;
+  border-radius: 5px;
+}
+.studio-inline-text {
+  position: absolute;
+  z-index: 5;
+  padding: 6px 10px !important;
+  border: 2px solid #2f54b8 !important;
+  border-radius: 3px !important;
+  background: #fffdf8f5 !important;
+  box-shadow: 0 4px 20px #191b1720;
+  text-align: center;
+  font:
+    600 clamp(14px, 2vw, 24px) "Manrope Variable",
+    sans-serif;
+  min-height: 36px;
+  outline: 3px solid #ffffff80;
+}
+.artboard {
+  position: relative;
+}
+.studio-context-shade {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+}
+.studio-context-menu {
+  position: fixed;
+  width: 240px;
+  max-height: calc(100dvh - 16px);
+  overflow: auto;
+  padding: 6px;
+  border: 1px solid #dedbd2;
+  border-radius: 12px;
+  background: #fffdf8;
+  box-shadow: 0 12px 50px #191b1730;
+}
+.studio-context-menu button {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #191b17;
+  text-align: left;
+  font-size: 12px;
+}
+.studio-context-menu button:hover,
+.studio-context-menu button:focus-visible {
+  background: #edf0fb;
+  outline: 0;
+}
+.studio-context-menu button:disabled {
+  opacity: 0.35;
+}
+.studio-context-menu kbd {
+  font:
+    10px "IBM Plex Mono",
+    monospace;
+  color: #73766e;
+}
+.workspace-action-status {
+  position: fixed;
+  bottom: 30px;
+  right: 24px;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: calc(100vw - 40px);
+  padding: 14px 18px;
+  border: 1px solid #dedbd2;
+  border-radius: 12px;
+  background: #fffaf1;
+  color: #191b17;
+  box-shadow: 0 8px 30px #191b1720;
+  font-size: 13px;
+}
+.busy-dot,
+.button[aria-busy="true"]::before {
+  content: "";
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: moro-busy 0.75s linear infinite;
+}
+.button[aria-busy="true"] {
+  gap: 9px;
+}
+@keyframes moro-busy {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .busy-dot,
+  .button[aria-busy="true"]::before {
+    animation: none;
+    border-style: dotted;
+  }
+}
+.studio-shortcuts {
+  display: grid;
+  grid-template-columns: minmax(135px, 1fr) 2fr;
+  gap: 12px 18px;
+  margin: 24px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.studio-shortcuts dt {
+  font-weight: 600;
+}
+.studio-shortcuts dd {
+  margin: 0;
+  color: #736c60;
+}
+.studio-layer-row[draggable="true"] {
+  cursor: grab;
+}
+.moro-app .button[aria-busy="true"]:disabled,
+.moro-app .studio-save[aria-busy="true"]:disabled {
+  opacity: 1;
+  cursor: progress;
+}
+.moro-app .studio-save[aria-busy="true"] svg {
+  animation: moro-busy 0.75s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .moro-app .studio-save[aria-busy="true"] svg {
+    animation: none;
+  }
+}
+.checkout-test-guide {
+  border: 1px solid #ddd7cb;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 18px 0;
+  background: #f6f2e9;
+  color: #191b17;
+}
+.checkout-guide-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+}
+.checkout-guide-heading > span {
+  font-size: 10px;
+  color: #61695b;
+}
+.checkout-test-guide p {
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 12px 0;
+}
+.checkout-guide-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px;
+  background: #fffdf8;
+  border: 1px solid #ddd7cb;
+  border-radius: 8px;
+}
+.checkout-guide-card code {
+  font:
+    500 13px "IBM Plex Mono",
+    monospace;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+.checkout-guide-card button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px;
+  background: transparent;
+  border: 0;
+  font-size: 11px;
+}
+.checkout-test-guide dl {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 11px;
+  margin: 14px 0;
+}
+.checkout-test-guide dt {
+  color: #736c60;
+  margin-bottom: 4px;
+}
+.checkout-test-guide dd {
+  margin: 0;
+  font-weight: 500;
+}
+@media (max-width: 480px) {
+  .checkout-guide-card {
+    padding: 9px;
+  }
+  .checkout-guide-card code {
+    font-size: 11px;
+  }
+}
+.modal-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+.modal-title-row h2 {
+  margin: 0;
+  font-size: 26px;
+  line-height: 1.15;
+  letter-spacing: -0.8px;
+}
+.modal-title-row > button {
+  border: 0;
+  background: transparent;
+  flex-shrink: 0;
+  min-width: 32px;
+  min-height: 32px;
+  font-size: 22px;
+  line-height: 1;
+  border-radius: 50%;
+}
+.modal-title-row > button:hover {
+  background: #e8e2d7;
+}

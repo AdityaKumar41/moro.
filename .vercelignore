@@ -1,0 +1,7 @@
+.env*
+tmp/
+tests/
+node_modules/
+*.pdf
+Dockerfile.worker
+supabase/

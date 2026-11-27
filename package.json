@@ -1,0 +1,64 @@
+{
+  "name": "moro-print",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "next dev --hostname 0.0.0.0",
+    "build": "next build",
+    "start": "next start --hostname 0.0.0.0",
+    "typecheck": "next typegen && tsc --noEmit",
+    "test": "vitest run",
+    "worker": "tsx scripts/worker.ts",
+    "check:env": "tsx scripts/check-env.ts",
+    "check:public": "node scripts/check-public-app.mjs",
+    "check:release": "node scripts/check-release.mjs",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@fontsource-variable/manrope": "^5.3.0",
+    "@fontsource/arimo": "^5.3.0",
+    "@fontsource/cousine": "^5.3.0",
+    "@fontsource/dm-sans": "^5.3.0",
+    "@fontsource/ibm-plex-mono": "^5.3.0",
+    "@fontsource/tinos": "^5.3.0",
+    "@supabase/ssr": "^0.8.0",
+    "@supabase/supabase-js": "^2.86.0",
+    "csv-parse": "^7.0.3",
+    "fontkit": "^3.0.0",
+    "lucide-react": "^0.577.0",
+    "next": "^16.0.0",
+    "nodemailer": "^10.6.1",
+    "pdf-lib": "^1.17.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "sharp": "^0.35.5",
+    "stripe": "^20.0.0",
+    "trazo-stickers": "^0.2.1",
+    "zod": "^4.1.0"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.6.0",
+    "@types/fontkit": "^2.0.9",
+    "@types/node": "^24.10.0",
+    "@types/nodemailer": "^8.0.2",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "prettier": "^3.10.1",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0",
+    "vitest": "^4.0.0"
+  },
+  "license": "MIT",
+  "description": "Custom web-to-print storefront, design studio and production workspace",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AdityaKumar41/moro..git"
+  },
+  "bugs": {
+    "url": "https://github.com/AdityaKumar41/moro./issues"
+  },
+  "homepage": "https://github.com/AdityaKumar41/moro.#readme"
+}

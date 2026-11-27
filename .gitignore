@@ -1,0 +1,22 @@
+node_modules/
+.next/
+.vercel/
+.env*
+!.env.example
+!.env.review.example
+!.env.integration.example
+tmp/
+output/
+backups/
+coverage/
+test-results/
+playwright-report/
+*.tsbuildinfo
+next-env.d.ts
+*.log
+*.pem
+*.key
+*.p12
+*.pfx
+.DS_Store
+/Digital_Heroes_PRD_level 2.pdf
