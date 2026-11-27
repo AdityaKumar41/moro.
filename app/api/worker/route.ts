@@ -26,7 +26,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const target = new URL(req.url).searchParams.get("order");
-    const orderId = target ? z.uuid().parse(target) : undefined;
+    const orderId = target === null ? undefined : z.uuid().parse(target);
     return NextResponse.json({
       batches: await drainQueue(45000, orderId),
       orderId: orderId ?? null,

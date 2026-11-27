@@ -105,10 +105,12 @@ async function main() {
     );
     assert.equal(older.length, 1);
     assert.equal(older[0].id, orders[0].id);
-    const first = await get("/api/designs"),
-      second = await get("/api/designs?offset=100");
-    assert.equal(first.length, 100);
-    const ids = new Set([...first, ...second].map((d: { id: string }) => d.id));
+    const ids = new Set<string>();
+    for (let offset = 0; ; offset += 100) {
+      const page = await get("/api/designs?offset=" + offset);
+      for (const d of page) ids.add(d.id);
+      if (designs.every((d) => ids.has(d.id)) || page.length < 100) break;
+    }
     for (const d of designs)
       assert(ids.has(d.id), "A saved design disappeared after the first page");
     console.log(

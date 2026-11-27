@@ -154,6 +154,9 @@ export default function Dashboard({ admin = false }: { admin?: boolean }) {
   const [status, setStatus] = useState("all");
   const [family, setFamily] = useState("all");
   const [date, setDate] = useState("");
+  const activeOrderQuery = orderSearchUrl({ search, status, family, date });
+  const activeOrderQueryRef = useRef(activeOrderQuery);
+  activeOrderQueryRef.current = activeOrderQuery;
   const [proofReadyKey, setProofReadyKey] = useState("");
   const [proofView, setProofView] = useState<{
     order: Order;
@@ -383,15 +386,17 @@ export default function Dashboard({ admin = false }: { admin?: boolean }) {
     a.click();
     URL.revokeObjectURL(a.href);
   }
-  const filtered = (matchingOrders ?? orders).filter(
-    (o) =>
-      (status === "all" || o.status === status) &&
-      (family === "all" || o.configuration.productId === family) &&
-      (!date || businessDate(o.created_at) === date) &&
-      `DH-${o.number} ${o.id} ${o.customer_id} ${o.shipping?.name} ${o.shipping?.email}`
-        .toLowerCase()
-        .includes(search.toLowerCase()),
-  );
+  const filtered =
+    matchingOrders ??
+    orders.filter(
+      (o) =>
+        (status === "all" || o.status === status) &&
+        (family === "all" || o.configuration.productId === family) &&
+        (!date || businessDate(o.created_at) === date) &&
+        `DH-${o.number} ${o.id} ${o.customer_id} ${o.shipping?.name} ${o.shipping?.email}`
+          .toLowerCase()
+          .includes(search.toLowerCase()),
+    );
   const awaitingProofs = orders.filter(needsProofApproval);
   const matchingDesigns = designs.filter((d) =>
     (
@@ -1249,6 +1254,7 @@ export default function Dashboard({ admin = false }: { admin?: boolean }) {
                   className="button outline"
                   disabled={!!busy}
                   onClick={async () => {
+                    const issuedQuery = activeOrderQueryRef.current;
                     setBusy("more");
                     try {
                       const rows = await request(
@@ -1257,6 +1263,7 @@ export default function Dashboard({ admin = false }: { admin?: boolean }) {
                           (matchingOrders ?? orders).length,
                         ),
                       );
+                      if (issuedQuery !== activeOrderQueryRef.current) return;
                       if (matchingOrders !== null) {
                         setMatchingOrders([...matchingOrders, ...rows]);
                         setMatchingHasMore(rows.length === 200);

@@ -215,6 +215,21 @@ async function main() {
     );
   } finally {
     for (const bucket of ["proofs", "production"]) {
+      async function discover(prefix: string) {
+        for (let offset = 0; ; offset += 100) {
+          const listing = await db.storage
+            .from(bucket)
+            .list(prefix, { limit: 100, offset });
+          if (listing.error) throw listing.error;
+          for (const object of listing.data || []) {
+            const path = prefix + "/" + object.name;
+            if (object.id) stored.push({ bucket, path });
+            else await discover(path);
+          }
+          if ((listing.data?.length || 0) < 100) break;
+        }
+      }
+      for (const id of orders) await discover(id);
       const values = stored
         .filter((s) => s.bucket === bucket)
         .map((s) => s.path);

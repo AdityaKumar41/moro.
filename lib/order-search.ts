@@ -48,7 +48,8 @@ export function orderSearchUrl(
 ) {
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(filters))
-    if (value && value !== "all") params.set(key, value);
+    if (value && !(["status", "family"].includes(key) && value === "all"))
+      params.set(key, value);
   if (offset) params.set("offset", String(offset));
   return "/api/orders" + (params.size ? "?" + params.toString() : "");
 }

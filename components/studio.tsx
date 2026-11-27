@@ -628,8 +628,63 @@ export default function Studio() {
     setSelected(l.id);
     setTab("edit");
   }
-  const imageContext = useRef({ artwork, configuration, variableData });
-  imageContext.current = { artwork, configuration, variableData };
+  const imageContext = useRef({
+    artwork,
+    configuration,
+    variableData,
+    uploadPath,
+    uploadName,
+  });
+  imageContext.current = {
+    artwork,
+    configuration,
+    variableData,
+    uploadPath,
+    uploadName,
+  };
+  const [sourceReady, setSourceReady] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    setSourceReady(false);
+    if (artwork.source && artwork.source.path === uploadPath) {
+      const expected = artwork.source.imageHash;
+      void Promise.all(
+        artwork.layers
+          .filter((l) => l.kind === "image" && !l.hidden && l.image)
+          .map(async (l) => {
+            const digest = await crypto.subtle.digest(
+              "SHA-256",
+              new TextEncoder().encode(l.image!),
+            );
+            return (
+              Array.from(new Uint8Array(digest), (b) =>
+                b.toString(16).padStart(2, "0"),
+              ).join("") === expected
+            );
+          }),
+      )
+        .then((matches) => {
+          if (!cancelled) setSourceReady(matches.some(Boolean));
+        })
+        .catch(() => {});
+    }
+    return () => {
+      cancelled = true;
+    };
+  }, [artwork, uploadPath]);
+  function assertImportContext(context: typeof imageContext.current) {
+    const current = imageContext.current;
+    if (
+      Object.keys(context).some(
+        (key) =>
+          current[key as keyof typeof current] !==
+          context[key as keyof typeof context],
+      )
+    )
+      throw Error(
+        "Your design changed while the artwork opened. Please prepare the file again.",
+      );
+  }
   async function logo(file?: File) {
     const replacement = replaceImage.current;
     replaceImage.current = null;
@@ -745,6 +800,7 @@ export default function Studio() {
   }
   async function upload(file?: File) {
     if (!file || operation.current || !requireAccount("upload")) return;
+    const context = imageContext.current;
     operation.current = true;
     setActivity("Uploading and preparing your artwork…");
     setPending(true);
@@ -779,6 +835,7 @@ export default function Studio() {
         configuration,
       });
       const imported = designSchema.parse(result.artwork);
+      assertImportContext(context);
       remember();
       setArtwork({ ...imported, name: artwork.name });
       setSelected(imported.layers[0].id);
@@ -1285,13 +1342,15 @@ export default function Studio() {
               </label>
               {uploadName && (
                 <p className="editor-caption">
-                  {artwork.source ? "Ready:" : "Attached:"} {uploadName}{" "}
-                  {!artwork.source && (
+                  {sourceReady ? "Ready:" : "Attached:"} {uploadName}{" "}
+                  {!sourceReady && (
                     <button
                       className="text-link"
                       disabled={pending}
                       onClick={async () => {
-                        if (!uploadPath) return;
+                        if (!uploadPath || operation.current) return;
+                        const context = imageContext.current;
+                        operation.current = true;
                         setPending(true);
                         setActivity("Preparing attached artwork…");
                         try {
@@ -1301,6 +1360,7 @@ export default function Studio() {
                             configuration,
                           });
                           const imported = designSchema.parse(result.artwork);
+                          assertImportContext(context);
                           remember();
                           setArtwork({ ...imported, name: artwork.name });
                           setSelected(imported.layers[0].id);
@@ -1310,6 +1370,7 @@ export default function Studio() {
                         } catch (e) {
                           setMessage((e as Error).message);
                         } finally {
+                          operation.current = false;
                           setPending(false);
                           setActivity("");
                         }

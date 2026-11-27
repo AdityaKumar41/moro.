@@ -52,3 +52,8 @@ it("preserves search filters while paginating instead of returning the unfiltere
   expect(u.searchParams.get("offset")).toBe("200");
   expect(u.searchParams.get("status")).toBe("completed");
 });
+it("preserves the literal search term all while removing only filter sentinels", () => {
+  expect(
+    orderSearchUrl({ search: "all", status: "all", family: "all", date: "" }),
+  ).toBe("/api/orders?search=all");
+});

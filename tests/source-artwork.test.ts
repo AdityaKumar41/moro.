@@ -159,3 +159,28 @@ it("honours PDF trim boxes and page rotation instead of shrinking existing bleed
     );
   }
 }, 15000);
+it("accepts embedded raster base64 slashes while rejecting external SVG bases", async () => {
+  const jpeg = await sharp({
+    create: { width: 10, height: 10, channels: 3, background: "white" },
+  })
+    .jpeg()
+    .toBuffer();
+  const encoded = jpeg.toString("base64");
+  expect(encoded).toContain("//");
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="60" height="40"><image width="60" height="40" href="data:image/jpeg;base64,${encoded}"/></svg>`;
+  await expect(
+    prepareSource(Buffer.from(svg), "embedded.svg", c),
+  ).resolves.toHaveProperty("image");
+  await expect(
+    prepareSource(
+      Buffer.from(
+        svg.replace(
+          'width="60" height="40"',
+          'width="60" height="40" xml:base="https://example.com/"',
+        ),
+      ),
+      "external.svg",
+      c,
+    ),
+  ).rejects.toThrow("self-contained");
+}, 15000);
