@@ -1,0 +1,99 @@
+.files summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  list-style: none;
+}
+.files summary:before {
+  content: "+";
+  font-size: 19px;
+  width: 16px;
+}
+.files[open] summary:before {
+  content: "−";
+}
+.files summary span {
+  font-size: 12px;
+  font-weight: 400;
+  color: #736c60;
+  margin-left: auto;
+}
+.search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0 8px;
+}
+.search input {
+  width: min(100%, 300px);
+  min-height: 44px;
+}
+.list {
+  border: 1px solid #e5ddcf;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 12px;
+}
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  font-size: 13px;
+}
+.row + .row {
+  border-top: 1px solid #e9e0d1;
+}
+.row > div {
+  display: flex;
+  gap: 8px;
+}
+.row a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid #d8cbb5;
+  border-radius: 8px;
+  font-size: 12px;
+}
+.row a:hover {
+  background: #f3ebdd;
+}
+.list > p {
+  padding: 16px;
+}
+.list button {
+  background: transparent;
+  border: 0;
+  text-decoration: underline;
+  color: inherit;
+}
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+  margin-top: 12px;
+  font-size: 12px;
+}
+.pagination button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid #d8cbb5;
+  border-radius: 8px;
+  background: transparent;
+}
+@media (max-width: 700px) {
+  .search input {
+    font-size: 16px;
+  }
+  .row a {
+    min-height: 44px;
+  }
+}

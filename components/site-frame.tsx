@@ -11,23 +11,20 @@ export function SiteFrame({
   sandbox: boolean;
 }) {
   const path = usePathname();
-  const isPublic = [
-    "/",
-    "/products",
-    "/work",
-    "/privacy",
-    "/terms",
-    "/auth",
-    "/auth/reset",
-    "/studio",
-  ].includes(path);
+  const isPublic = !["/account", "/admin", "/studio"].includes(path);
   const workspace = ["/studio", "/account", "/admin"].includes(path);
   const auth = path.startsWith("/auth");
   return (
     <AccountProvider>
       <div
         className={
-          workspace ? "moro-app" : isPublic ? "moro-public" : "moro-workspace"
+          workspace
+            ? "moro-app"
+            : auth
+              ? "moro-public moro-auth-frame"
+              : isPublic
+                ? "moro-public"
+                : "moro-workspace"
         }
         data-preview={sandbox}
       >

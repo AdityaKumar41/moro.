@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 export function ProofImage({
   src,
   alt,
@@ -16,6 +16,11 @@ export function ProofImage({
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
   const [retry, setRetry] = useState(0);
+  useEffect(() => {
+    if (loaded || failed) return;
+    const timer = setTimeout(() => setFailed(true), 20000);
+    return () => clearTimeout(timer);
+  }, [loaded, failed, retry]);
   return (
     <div
       className="proof-image-stage"

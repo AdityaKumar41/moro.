@@ -37,6 +37,13 @@ export function Header() {
         <Link
           href={account.status === "guest" ? "/auth" : "/account"}
           className="moro-account"
+          aria-label={
+            account.status === "authenticated"
+              ? "Your projects"
+              : account.status === "guest"
+                ? "Sign in"
+                : "Checking your account"
+          }
         >
           <UserRound size={17} />
           <span>

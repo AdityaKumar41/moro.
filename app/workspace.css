@@ -2590,3 +2590,8 @@
   .ops-health-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .ops-health-heading { flex-direction: column; }
 }
+
+/* Authentication screens keep their paper surface through the full viewport. */
+.moro-auth-frame { min-height: 100dvh; background: #fffaf1; }
+.auth-appbar .moro-logo { font-size: 30px; font-weight: 700; letter-spacing: -1.7px; }
+@media(max-width:700px) { .auth-appbar .moro-logo { font-size: 26px; } }
