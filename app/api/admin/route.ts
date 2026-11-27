@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+import { sendNotifications } from "@/lib/worker";
+import { after, NextResponse } from "next/server";
 import { z } from "zod";
 import {
   actor,
@@ -7,13 +8,14 @@ import {
   HttpError,
   jsonBody,
   sameOrigin,
+  limit,
 } from "@/lib/http";
 import { adminDb } from "@/lib/db";
 export async function GET() {
   try {
-    await actor(true);
+    const user = await actor(true);
     const db = adminDb();
-    const [profiles, jobs, templates] = await Promise.all([
+    const [profiles, jobs, templates, health] = await Promise.all([
       db
         .from("profiles")
         .select("*")
@@ -28,11 +30,13 @@ export async function GET() {
         .from("templates")
         .select("*")
         .order("created_at", { ascending: false }),
+      db.rpc("operations_health", { p_actor: user.id }),
     ]);
     return NextResponse.json({
       profiles: checked(profiles).data,
       jobs: checked(jobs).data,
       templates: checked(templates).data,
+      health: checked(health).data,
     });
   } catch (e) {
     return fail(e);
@@ -43,7 +47,19 @@ export async function POST(req: Request) {
     sameOrigin(req);
     const u = await actor(true);
     const b = await jsonBody(req);
-    if (b.action === "role") {
+    if (b.action === "retry-email") {
+      const { id } = z.object({ id: z.uuid() }).parse(b);
+      await limit("retry-email:" + u.id, 10);
+      checked(
+        await adminDb().rpc("retry_notification", {
+          p_actor: u.id,
+          p_notification: id,
+        }),
+      );
+      after(async () => {
+        await sendNotifications(id);
+      });
+    } else if (b.action === "role") {
       const v = z
         .object({ id: z.uuid(), role: z.enum(["customer", "admin"]) })
         .parse(b);

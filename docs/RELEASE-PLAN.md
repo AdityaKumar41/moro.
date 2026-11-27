@@ -20,3 +20,5 @@
 Corporate/multi-account ordering, a native mobile app and full Xero OAuth/mapping/reconciliation are future integrations, not silently completed features. Current APIs, product/templates and accounting CSV provide extension seams.
 
 Completed repairs include cloud autosave, independent checkout-to-project persistence, serialized saves and save barriers, emailed PDF receipts with targeted resend, and configured-origin auth callbacks. Keep open acceptance explicit; a checklist entry is complete only when the corresponding deployed/physical scenario passes.
+
+Staff service-health snapshots and audited failed-email retry are now implemented with database role/payment/concurrency gates. This improves operational visibility but does not close external alert delivery, worker heartbeat monitoring, MFA or backup restore acceptance.

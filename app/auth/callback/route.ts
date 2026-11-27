@@ -24,17 +24,17 @@ export async function GET(req: Request) {
     );
   }
   try {
-    if (code) {
-      const db = await sessionDb();
-      const { error } = await db.auth.exchangeCodeForSession(code);
-      if (!error) {
-        const next =
-          url.searchParams.get("next") === "/auth/reset"
-            ? "/auth/reset"
-            : jar.get("moro-auth-return")?.value;
-        jar.set("moro-auth-return", "", { path: "/auth", maxAge: 0 });
-        return NextResponse.redirect(new URL(authDestination(next), origin));
-      }
+    // The provider exchange is mandatory even for a missing/empty code. A
+    // user-controlled query parameter never authorizes a session by itself.
+    const db = await sessionDb();
+    const { error } = await db.auth.exchangeCodeForSession(code || "");
+    if (!error) {
+      const next =
+        url.searchParams.get("next") === "/auth/reset"
+          ? "/auth/reset"
+          : jar.get("moro-auth-return")?.value;
+      jar.set("moro-auth-return", "", { path: "/auth", maxAge: 0 });
+      return NextResponse.redirect(new URL(authDestination(next), origin));
     }
   } catch {
     /* Network and provider failures return to a recoverable sign-in screen. */

@@ -10,6 +10,12 @@ Payment notifications attach the same branded PDF receipt as the authenticated a
 
 SMTP has at-least-once semantics: a delivery followed by a lost acknowledgement can be retried. Stable Message-IDs help correlation, not guaranteed exactly-once delivery. Resend additionally receives an idempotency key. Verify the actual inbox attachment and public account link. Local .env files may use localhost; explicitly choose the intended public APP_URL when testing received email.
 
+## Staff service health
+
+Store management → service health shows total queued/in-progress/failed work, expired leases, oldest queued age and the 50 most recent email deliveries. Counts are a timestamped snapshot; refresh to update. They are not a worker heartbeat or a substitute for automated alerting. Sent means transport acceptance, not inbox placement.
+
+After correcting delivery configuration, staff can retry a failed email. The server and database check the administrator role; only failed messages can be reset, receipt messages still require a paid owning order, and the retry is recorded with its actor and prior attempts. A row lock prevents a double retry and targeted dispatch avoids draining unrelated messages. No provider error or recipient address is exposed to public callers. Apply migration `202611270007_operations_health.sql` before deploying this feature.
+
 ## Incident checks
 
 - Review failed/stuck render work, notification retries and oldest queued age. Record provider errors privately without credentials or unnecessary personal data.

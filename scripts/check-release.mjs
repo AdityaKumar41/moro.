@@ -1,11 +1,8 @@
 import { execFileSync } from "node:child_process";
-import { readFileSync, statSync, existsSync } from "node:fs";
 import assert from "node:assert/strict";
-const files = execFileSync(
-  "git",
-  ["ls-files", "--cached", "--others", "--exclude-standard", "-z"],
-  { encoding: "utf8" },
-)
+const files = execFileSync("git", ["ls-files", "--cached", "-z"], {
+  encoding: "utf8",
+})
   .split("\0")
   .filter(Boolean);
 const examples = new Set([".env.example", ".env.integration.example"]);
@@ -25,16 +22,17 @@ for (const file of files) {
     failures.push(`${file}: private/generated file in source release`);
     continue;
   }
-  if (!existsSync(file)) continue;
-  const stat = statSync(file);
-  if (stat.size > 8 * 1024 * 1024)
+  const bytes = execFileSync("git", ["show", ":" + file], {
+    maxBuffer: 16 * 1024 * 1024,
+  });
+  if (bytes.length > 8 * 1024 * 1024)
     failures.push(`${file}: exceeds 8 MiB source asset budget`);
   if (
     !/\.(?:[cm]?[jt]sx?|json|md|ya?ml|sql|css|html|toml|txt)$/.test(file) &&
     !examples.has(file)
   )
     continue;
-  const source = readFileSync(file, "utf8");
+  const source = bytes.toString("utf8");
   for (const rule of credentialPatterns) {
     rule.lastIndex = 0;
     if (rule.test(source))
@@ -55,8 +53,12 @@ for (const file of [
 ])
   if (!files.includes(file))
     failures.push(`${file}: required release file missing`);
-const pkg = JSON.parse(readFileSync("package.json", "utf8"));
-const lock = JSON.parse(readFileSync("package-lock.json", "utf8"));
+const pkg = JSON.parse(
+  execFileSync("git", ["show", ":package.json"], { encoding: "utf8" }),
+);
+const lock = JSON.parse(
+  execFileSync("git", ["show", ":package-lock.json"], { encoding: "utf8" }),
+);
 assert.equal(pkg.name, lock.name, "Lockfile root name must match package");
 assert.equal(pkg.license, "MIT");
 if (failures.length) {

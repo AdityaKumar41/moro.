@@ -34,6 +34,12 @@ beforeAll(async () => {
   await db.exec(
     readFileSync("supabase/migrations/202611260006_payment_audit.sql", "utf8"),
   );
+  await db.exec(
+    readFileSync(
+      "supabase/migrations/202611270007_operations_health.sql",
+      "utf8",
+    ),
+  );
   await db.query(`insert into auth.users(id) values($1),($2),($3)`, [
     alice,
     bob,
@@ -212,4 +218,65 @@ it("applies a captured payment once and attributes automated proof generation to
     [id],
   );
   expect(events.rows).toEqual([{ actor_id: null }]);
+});
+
+it("restricts operational health to staff and counts failed/expired email work without exposing customer contact", async () => {
+  await expect(
+    db.query("select operations_health($1)", [alice]),
+  ).rejects.toThrow(/Administrator/);
+  await asCustomer(alice, async () => {
+    await expect(
+      db.query("select operations_health($1)", [admin]),
+    ).rejects.toThrow(/permission denied/);
+  });
+  await db.query(
+    "insert into notifications(customer_id,order_id,kind,state,attempts) values($1,$2,'proof_ready','failed',4)",
+    [alice, order],
+  );
+  const result = await db.query<{
+    health: { emails: { failed: number }; deliveries: unknown[] };
+  }>("select operations_health($1) as health", [admin]);
+  expect(result.rows[0].health.emails.failed).toBeGreaterThan(0);
+  expect(JSON.stringify(result.rows[0].health.deliveries)).not.toContain(
+    "customer_id",
+  );
+});
+it("requeues only a failed message once, clears its lease and records the administrator", async () => {
+  const inserted = await db.query<{ id: string }>(
+    "insert into notifications(customer_id,order_id,kind,state,attempts,locked_until) values($1,$2,'proof_ready','failed',4,now()) returning id",
+    [alice, order],
+  );
+  const id = inserted.rows[0].id;
+  await expect(
+    db.query("select retry_notification($1,$2)", [alice, id]),
+  ).rejects.toThrow(/Administrator/);
+  await db.query("select retry_notification($1,$2)", [admin, id]);
+  const row = await db.query(
+    "select state,attempts,locked_until from notifications where id=$1",
+    [id],
+  );
+  expect(row.rows).toEqual([
+    { state: "queued", attempts: 0, locked_until: null },
+  ]);
+  await expect(
+    db.query("select retry_notification($1,$2)", [admin, id]),
+  ).rejects.toThrow(/Only failed/);
+  const audits = await db.query(
+    "select actor_id from audit_events where event='notification_retry_requested' and detail->>'notification_id'=$1",
+    [id],
+  );
+  expect(audits.rows).toEqual([{ actor_id: admin }]);
+});
+it("cannot retry a payment receipt after refund or against an unpaid order", async () => {
+  const created = await db.query<{ id: string }>(
+    "insert into orders(customer_id,request_key,configuration,artwork,pricing,total,currency,shipping,payment_status) values($1,gen_random_uuid(),'{}','{}','{}',100,'INR','{}','unpaid') returning id",
+    [alice],
+  );
+  const n = await db.query<{ id: string }>(
+    "insert into notifications(customer_id,order_id,kind,state,attempts) values($1,$2,'receipt_requested','failed',4) returning id",
+    [alice, created.rows[0].id],
+  );
+  await expect(
+    db.query("select retry_notification($1,$2)", [admin, n.rows[0].id]),
+  ).rejects.toThrow(/paid order/);
 });

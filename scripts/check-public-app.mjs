@@ -133,10 +133,16 @@ try {
     body: JSON.stringify({ orderId: "11111111-1111-4111-8111-111111111111" }),
   });
   assert(payment.status >= 400);
-  assert(!(await payment.text()).includes("checkout.stripe.com"));
+  const disabledCheckout = await payment.json();
+  assert.equal(typeof disabledCheckout.error, "string");
+  assert.equal(disabledCheckout.url, undefined);
   for (const path of ["/account", "/admin"]) {
     const r = await get(path);
-    if (r.status === 307) assert(r.headers.get("location")?.includes("/auth"));
+    if (r.status === 307)
+      assert.equal(
+        new URL(r.headers.get("location"), origin).pathname,
+        "/auth",
+      );
     else {
       const body = await r.text();
       assert(body.includes("NEXT_REDIRECT") && body.includes("/auth"), path);

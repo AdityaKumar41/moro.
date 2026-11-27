@@ -135,3 +135,15 @@ it("keeps expired-link and cancellation recovery on the configured origin too", 
     vi.unstubAllEnvs();
   }
 });
+
+it("requires provider validation even when the callback code is missing", async () => {
+  mocks.exchange.mockResolvedValue({ error: { message: "missing code" } });
+  const response = await callback(
+    new Request("https://store.test/auth/callback"),
+  );
+  expect(mocks.exchange).toHaveBeenCalledWith("");
+  expect(new URL(response.headers.get("location")!).pathname).toBe("/auth");
+  expect(
+    new URL(response.headers.get("location")!).searchParams.get("error"),
+  ).toBe("expired");
+});
