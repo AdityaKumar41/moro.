@@ -33,6 +33,9 @@ for (const name of [
   "EMAIL_FROM",
   "RESEND_API_KEY",
   "WORKER_TOKEN",
+  "DATABASE_URL",
+  "DIRECT_URL",
+  "DATABASE_SSL_CA_BASE64",
 ])
   env[name] = "";
 const child = spawn(
@@ -92,6 +95,29 @@ try {
         .get("content-security-policy")
         ?.includes("frame-ancestors 'none'"),
     );
+  }
+  const galleryHtml = await (await get("/work")).text();
+  assert(galleryHtml.includes("Independent print inspiration"));
+  assert(galleryHtml.includes("Photo &amp; licence"));
+  for (const family of [
+    "labels",
+    "race",
+    "mtb",
+    "stamps",
+    "trophies",
+    "laser",
+  ]) {
+    assert(
+      galleryHtml.includes(`/images/gallery/${family}.webp`) ||
+        galleryHtml.includes(
+          encodeURIComponent(`/images/gallery/${family}.webp`),
+        ),
+      family,
+    );
+    const photo = await get(`/images/gallery/${family}.webp`);
+    assert.equal(photo.status, 200, family);
+    assert(photo.headers.get("content-type")?.includes("image/webp"), family);
+    assert((await photo.arrayBuffer()).byteLength > 1000, family);
   }
   const catalogue = await get("/api/catalog");
   assert.equal(catalogue.status, 200);

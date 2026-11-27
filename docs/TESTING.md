@@ -2,9 +2,9 @@
 
 ## Credential-free CI
 
-Node 22 and 24 run `npm ci`, `npm run typecheck`, `npm test`, `npm run build`, `npm run check:public` and `npm run check:release`. The workflow has read-only repository access and no application credentials. Dependency audit and CodeQL run separately. No test charges cards, sends customer email or contacts the deployed service.
+Node 22 and 24 run `npm ci`, `npm run db:validate`, `npm run typecheck`, `npm test`, `npm run build`, `npm run check:public` and `npm run check:release`. The workflow has read-only repository access and no application credentials. Dependency audit and CodeQL run separately. No test charges cards, sends customer email or contacts the deployed service.
 
-Vitest covers pricing/GST/volume thresholds, print geometry/fonts, six product families, CSV substitution, PDF/PNG output, payment modes, webhook/approval rules, PGlite migrations/RLS, studio commands/history/resources, request feedback, receipt attachments/transports and auth callback origin/return validation. Database tests use synthetic local identities. The public smoke check starts a built Next server with production secrets removed, checks routes, quotes, security headers and disabled service boundaries, and shuts it down.
+Vitest covers pricing/GST/volume thresholds, print geometry/fonts, six product families, a 500-row distinct-output render regression, CSV substitution, PDF/PNG output, payment modes, webhook/approval rules, PGlite migrations/RLS, studio commands/history/resources, request feedback, receipt attachments/transports and auth callback origin/return validation. Database tests use synthetic local identities. The public smoke check starts a built Next server with production secrets removed, checks routes, quotes, security headers and disabled service boundaries, and shuts it down.
 
 ## Isolated real-service acceptance
 
@@ -23,4 +23,6 @@ The studio check creates/removes named projects and an unpaid order fixture. The
 
 ## Acceptance beyond CI
 
-Before launch, perform real test-mode hosted payment and signed webhook checks, confirmation/recovery/Google sessions, maximum-size/500-row cases, touch/keyboard/screen-reader and reduced-motion checks, representative concurrent jobs, failed leases/retries and a backup restore drill. Verify received email attachments/links in the inbox; a sent queue state only proves transport acceptance. Physical press/colour/cutting requirements and genuine merchant tax information need operator approval. Record private evidence outside the public source tree.
+Before launch, perform real test-mode hosted payment and signed webhook checks, confirmation/recovery/Google sessions, maximum-size documents and hosted 500-row job-capacity cases, touch/keyboard/screen-reader and reduced-motion checks, representative concurrent jobs, failed leases/retries and a backup restore drill. Verify received email attachments/links in the inbox; a sent queue state only proves transport acceptance. Physical press/colour/cutting requirements and genuine merchant tax information need operator approval. Record private evidence outside the public source tree.
+
+The 500-row offline render regression checks unique image output for every row and PNG/PDF geometry at rows 1, 250 and 500. This checks renderer correctness at the supported batch limit, not serverless throughput, concurrent-job capacity or physical print acceptance. Prisma schema parity and restricted-login RLS tests run against local SQL; connected deployment acceptance additionally verifies TLS and pooled actor isolation. See PRISMA.md.
