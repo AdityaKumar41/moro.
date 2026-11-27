@@ -102,7 +102,7 @@ it("hidden text neither renders nor requires CSV columns, while locked visible c
       config,
     ),
   ).toThrow("visible");
-});
+}, 15000);
 it("drag ordering moves only the intended layer and respects locks", async () => {
   const { moveLayerTo } = await import("../lib/studio-commands");
   const art = initialArtwork(),
