@@ -1,3 +1,4 @@
+import { prismaConfigured, withPrismaSession } from "@/lib/prisma";
 import { saveDesignForOwner } from "@/lib/design-store";
 import { resourcesForOwner } from "@/lib/design-resources";
 import { NextResponse } from "next/server";
@@ -7,20 +8,30 @@ import { designSchema } from "@/lib/catalog";
 export async function GET() {
   try {
     const u = await actor();
-    return NextResponse.json(
-      (
-        checked(
+    const rows = prismaConfigured()
+      ? await withPrismaSession(u.id, (db) =>
+          db.design.findMany({
+            where: { customer_id: u.id },
+            orderBy: { created_at: "desc" },
+            take: 100,
+          }),
+        )
+      : (checked(
           await adminDb()
             .from("designs")
             .select("*")
             .eq("customer_id", u.id)
             .order("created_at", { ascending: false })
             .limit(100),
-        ).data ?? []
-      ).map((row) => ({
+        ).data ?? []);
+    return NextResponse.json(
+      rows.map((row) => ({
         ...row,
         artwork: designSchema.parse(row.artwork),
-        resources: resourcesForOwner(row.artwork.resources, u.id),
+        resources: resourcesForOwner(
+          (row.artwork as Record<string, unknown>).resources,
+          u.id,
+        ),
       })),
     );
   } catch (e) {

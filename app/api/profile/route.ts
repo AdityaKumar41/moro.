@@ -1,3 +1,4 @@
+import { prismaConfigured, withPrismaSession } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { actor, checked, fail, jsonBody, sameOrigin } from "@/lib/http";
@@ -5,9 +6,13 @@ import { adminDb } from "@/lib/db";
 export async function GET() {
   try {
     const u = await actor();
-    const { data } = checked(
-      await adminDb().from("profiles").select("*").eq("id", u.id).single(),
-    );
+    const data = prismaConfigured()
+      ? await withPrismaSession(u.id, (db) =>
+          db.profile.findUniqueOrThrow({ where: { id: u.id } }),
+        )
+      : checked(
+          await adminDb().from("profiles").select("*").eq("id", u.id).single(),
+        ).data;
     return NextResponse.json({ ...data, email: u.email });
   } catch (e) {
     return fail(e);

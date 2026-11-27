@@ -13,6 +13,10 @@ Use a dedicated Supabase project, your own Stripe test account and your own send
 5. For local email-flow testing, explicitly allow the corresponding `http://localhost:3000` callback URLs in the isolated test project. Do not use broad wildcard redirects. The callback uses APP_URL to avoid redirecting to an internal server hostname.
 6. Create a verified account for each staff member. Promote the intended user explicitly with a reviewed SQL statement: `update public.profiles set role='admin' where id='<verified user UUID>';`. Staff cannot approve on behalf of a customer. Never ship shared administrator credentials.
 
+## Prisma reads
+
+For typed profile/design reads over the same Supabase database, configure the restricted session-pooler role and validated TLS described in [PRISMA.md](PRISMA.md). No data migration or replacement backend is needed. Do not use the database owner as the application ORM login.
+
 ## Google sign-in
 
 Create a web OAuth client in your Google project, configure consent for basic identity scopes and add your Supabase project's exact `/auth/v1/callback` URL as the Google redirect URI. Configure the client ID/secret in the Supabase Google provider. Add the app's public origin as an authorized JavaScript origin where required. Keep identity email/nonce checks enabled. The app requests no Gmail or Drive access. Test provider cancellation and return-to-design behavior; publish consent only after the appropriate owner approval/verification.
