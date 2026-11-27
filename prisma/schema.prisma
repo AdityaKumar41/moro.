@@ -1,0 +1,204 @@
+// Typed read model for the Supabase public schema.
+// SQL migrations own RLS, CHECK constraints, auth/storage, triggers and RPCs.
+// Apply changes through supabase/migrations; see docs/PRISMA.md.
+generator client {
+  provider     = "prisma-client"
+  output       = "../generated/prisma"
+  moduleFormat = "esm"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// id also references Supabase-managed auth.users with ON DELETE CASCADE.
+/// That cross-schema identity constraint remains owned by the SQL migrations.
+model Profile {
+  id             String         @id @db.Uuid
+  name           String         @default("") @db.Text
+  company        String         @default("") @db.Text
+  gstin          String         @default("") @db.Text
+  role           String         @default("customer") @db.Text
+  created_at     DateTime       @default(now()) @db.Timestamptz(6)
+  designs        Design[]
+  orders         Order[]
+  approvedProofs Proof[]        @relation("ProofApprover")
+  auditEvents    AuditEvent[]
+  notifications  Notification[]
+
+  @@map("profiles")
+}
+
+model Design {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  customer_id   String   @db.Uuid
+  name          String   @db.Text
+  configuration Json     @db.JsonB
+  artwork       Json     @db.JsonB
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  customer      Profile  @relation(fields: [customer_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("designs")
+}
+
+model Order {
+  id                String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  number            BigInt         @unique @default(autoincrement())
+  customer_id       String         @db.Uuid
+  request_key       String         @db.Uuid
+  configuration     Json           @db.JsonB
+  artwork           Json           @db.JsonB
+  variable_data     Json           @default("[]") @db.JsonB
+  upload_path       String?        @db.Text
+  pricing           Json           @db.JsonB
+  total             BigInt
+  currency          String         @db.Text
+  shipping          Json           @db.JsonB
+  status            String         @default("quote") @db.Text
+  payment_status    String         @default("unpaid") @db.Text
+  payment_ref       String?        @db.Text
+  checkout_id       String?        @db.Text
+  checkout_url      String?        @db.Text
+  approved_proof_id String?        @db.Uuid
+  created_at        DateTime       @default(now()) @db.Timestamptz(6)
+  customer          Profile        @relation(fields: [customer_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  proofs            Proof[]        @relation("OrderProofs")
+  approvedProof     Proof?         @relation("ApprovedProof", fields: [approved_proof_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "approved_proof_fk")
+  artifacts         Artifact[]
+  auditEvents       AuditEvent[]
+  jobs              Job[]
+  notifications     Notification[]
+  paymentEvents     PaymentEvent[]
+
+  @@unique([customer_id, request_key])
+  @@index([customer_id, created_at(sort: Desc)], map: "orders_customer_created")
+  @@index([status, created_at(sort: Desc)], map: "orders_pipeline")
+  @@map("orders")
+}
+
+model Proof {
+  id             String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  order_id       String     @db.Uuid
+  version        Int
+  artwork        Json       @db.JsonB
+  state          String     @default("rendering") @db.Text
+  preview_path   String?    @db.Text
+  approved_by    String?    @db.Uuid
+  approved_at    DateTime?  @db.Timestamptz(6)
+  comment        String?    @db.Text
+  created_at     DateTime   @default(now()) @db.Timestamptz(6)
+  order          Order      @relation("OrderProofs", fields: [order_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  approver       Profile?   @relation("ProofApprover", fields: [approved_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  approvedOrders Order[]    @relation("ApprovedProof")
+  artifacts      Artifact[]
+  jobs           Job[]
+
+  @@unique([order_id, version])
+  @@index([order_id, version(sort: Desc)], map: "proofs_order")
+  @@map("proofs")
+}
+
+model Artifact {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  order_id   String   @db.Uuid
+  proof_id   String   @db.Uuid
+  path       String   @unique @db.Text
+  kind       String   @db.Text
+  row_number Int
+  sha256     String   @db.Text
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  order      Order    @relation(fields: [order_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  proof      Proof    @relation(fields: [proof_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("artifacts")
+}
+
+model AuditEvent {
+  id         BigInt   @id @default(autoincrement())
+  order_id   String?  @db.Uuid
+  actor_id   String?  @db.Uuid
+  event      String   @db.Text
+  detail     Json     @default("{}") @db.JsonB
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  order      Order?   @relation(fields: [order_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  actor      Profile? @relation(fields: [actor_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("audit_events")
+}
+
+model Job {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  order_id       String    @db.Uuid
+  proof_id       String    @db.Uuid
+  kind           String    @db.Text
+  state          String    @default("queued") @db.Text
+  attempts       Int       @default(0)
+  locked_until   DateTime? @db.Timestamptz(6)
+  lease_id       String?   @db.Uuid
+  last_error     String?   @db.Text
+  created_at     DateTime  @default(now()) @db.Timestamptz(6)
+  completed_rows Int       @default(0)
+  preview_path   String?   @db.Text
+  order          Order     @relation(fields: [order_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  proof          Proof     @relation(fields: [proof_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([proof_id, kind])
+  @@index([state, created_at], map: "jobs_queue")
+  @@index([state, created_at], map: "jobs_state_created_idx")
+  @@map("jobs")
+}
+
+model Notification {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  customer_id  String    @db.Uuid
+  order_id     String    @db.Uuid
+  kind         String    @db.Text
+  state        String    @default("queued") @db.Text
+  attempts     Int       @default(0)
+  created_at   DateTime  @default(now()) @db.Timestamptz(6)
+  locked_until DateTime? @db.Timestamptz(6)
+  customer     Profile   @relation(fields: [customer_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  order        Order     @relation(fields: [order_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([state, created_at], map: "notifications_state_created_idx")
+  @@map("notifications")
+}
+
+model PaymentEvent {
+  id         String   @id @db.Text
+  order_id   String   @db.Uuid
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  order      Order    @relation(fields: [order_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("payment_events")
+}
+
+model RateLimit {
+  key          String   @id @db.Text
+  window_start DateTime @db.Timestamptz(6)
+  count        Int
+
+  @@map("rate_limits")
+}
+
+model Product {
+  id         String     @id @db.Text
+  definition Json       @db.JsonB
+  active     Boolean    @default(true)
+  sort_order Int        @default(100)
+  updated_at DateTime   @default(now()) @db.Timestamptz(6)
+  templates  Template[]
+
+  @@map("products")
+}
+
+model Template {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  product_id String   @db.Text
+  name       String   @db.Text
+  artwork    Json     @db.JsonB
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  product    Product  @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("templates")
+}

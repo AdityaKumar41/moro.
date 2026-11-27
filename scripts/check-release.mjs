@@ -7,7 +7,7 @@ const files = execFileSync("git", ["ls-files", "--cached", "-z"], {
   .filter(Boolean);
 const examples = new Set([".env.example", ".env.integration.example"]);
 const privatePath =
-  /(^|\/)(?:node_modules|\.next|\.vercel|tmp|backups|output|coverage|test-results|playwright-report)(\/|$)|(?:^|\/)\.env(?:\.|$)|\.(?:pem|key|p12|pfx|log|tsbuildinfo|pdf)$/i;
+  /(^|\/)(?:node_modules|\.next|\.vercel|tmp|generated|backups|output|coverage|test-results|playwright-report)(\/|$)|(?:^|\/)\.env(?:\.|$)|\.(?:pem|key|p12|pfx|log|tsbuildinfo|pdf)$/i;
 const credentialPatterns = [
   /\b(?:sk|rk)_(?:live|test)_[A-Za-z0-9]{20,}\b/g,
   /\bwhsec_[A-Za-z0-9]{20,}\b/g,
@@ -28,7 +28,7 @@ for (const file of files) {
   if (bytes.length > 8 * 1024 * 1024)
     failures.push(`${file}: exceeds 8 MiB source asset budget`);
   if (
-    !/\.(?:[cm]?[jt]sx?|json|md|ya?ml|sql|css|html|toml|txt)$/.test(file) &&
+    !/\.(?:[cm]?[jt]sx?|json|md|ya?ml|sql|prisma|css|html|toml|txt)$/.test(file) &&
     !examples.has(file)
   )
     continue;

@@ -1,15 +1,17 @@
 # moro.
 
-A custom web-to-print storefront, browser design studio, customer workspace and production console. Built with Next.js, React, Supabase and Stripe Checkout for six print divisions: labels, race numbers, MTB boards, stamps, awards and laser-cut work.
+A custom web-to-print storefront, browser design studio, customer workspace and production console. Built with Next.js, React, Supabase, Prisma and Stripe Checkout for six print divisions: labels, race numbers, MTB boards, stamps, awards and laser-cut work.
 
 [![Platform checks](https://github.com/AdityaKumar41/moro./actions/workflows/ci.yml/badge.svg)](https://github.com/AdityaKumar41/moro./actions/workflows/ci.yml)
 [![Security analysis](https://github.com/AdityaKumar41/moro./actions/workflows/security.yml/badge.svg)](https://github.com/AdityaKumar41/moro./actions/workflows/security.yml)
 
-**Status:** functional test-payment application under continuing acceptance. Live payments are disabled. Sample prices/GST rates, illustrative gallery work and generated files need the merchant's approval before real fulfilment. See [readiness](docs/PRD-READINESS.md) for implemented behavior and open requirements.
+**Status:** functional test-payment application under continuing acceptance. Live payments are disabled. Sample prices/GST rates, generated print files need the merchant's approval before real fulfilment. See [readiness](docs/PRD-READINESS.md) for implemented behavior and open requirements.
+
+Live assessment: [open Moro](https://digital-heroes-umber-kappa.vercel.app). Start with the [reviewer walkthrough](docs/SUBMISSION.md).
 
 ## Run locally
 
-Use Node.js 24 LTS (Node 22 is also tested) and npm.
+Use Node.js 24 LTS (Node 22.12+ is also tested) and npm.
 
 ```sh
 git clone https://github.com/AdityaKumar41/moro..git
@@ -22,6 +24,7 @@ npm run dev
 The public storefront, calculator and editor can be explored without credentials. Authentication, cloud saving, checkout, private files and staff actions require your own Supabase project and service configuration. The app never substitutes a fake authenticated session or simulated payment success.
 
 ```sh
+npm run db:validate
 npm run typecheck
 npm test
 npm run build
@@ -29,10 +32,11 @@ npm run check:public
 npm run check:release
 ```
 
-The public smoke check starts the production build on an ephemeral local port. Unit/integration tests include a local PostgreSQL-compatible PGlite database, real font geometry and server PDF/PNG rendering. These checks require no merchant credentials and do not send email or charge cards. See [testing](docs/TESTING.md).
+The public smoke check starts the production build on an ephemeral local port. Unit/integration tests include a local PostgreSQL-compatible PGlite database, real font geometry and server PDF/PNG rendering. These checks require no merchant credentials and do not send email or charge cards. See [testing](docs/TESTING.md) and [Prisma with Supabase](docs/PRISMA.md).
 
 ## What is implemented
 
+- A licensed real-work inspiration gallery grouped by all six product families.
 - Parameter-driven products, instant integer-money pricing, automatic volume discounts and GST totals.
 - Focused design studio with templates, text, images, movement/resize/rotation, physical print boundaries, keyboard actions, layer ordering/locking/visibility, undo/redo and cloud autosave.
 - Versioned private proofs, customer-only approval, revision requests and production-download gates.

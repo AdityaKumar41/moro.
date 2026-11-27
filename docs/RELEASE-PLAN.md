@@ -10,7 +10,7 @@
 
 ## Owner/operator inputs
 
-- An approved real-work image library with publication rights and useful descriptions. Until supplied, keep concepts labelled.
+- The real-work inspiration gallery is sourced under documented reuse licences across all six families. Future Moro customer commissions need customer publication permission before inclusion.
 - Actual manufacturing samples and print/cut/colour requirements for each family/material. Current raster RGB files are not certified machine toolpaths or PDF/X/CMYK output.
 - A sending domain and volume, authenticated transactional sender and bounce/delivery monitoring.
 - Genuine legal/GST identity, approved prices/HSN/tax/delivery/refund terms, merchant readiness and fulfilment sign-off for any future real-money launch. Real payments remain deliberately disabled.

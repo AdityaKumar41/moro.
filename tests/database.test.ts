@@ -1,3 +1,4 @@
+import { prismaColumns, type SchemaColumn } from "../scripts/schema-contract";
 import { beforeAll, afterAll, it, expect } from "vitest";
 import { PGlite } from "@electric-sql/pglite";
 import { readFileSync } from "node:fs";
@@ -37,6 +38,12 @@ beforeAll(async () => {
   await db.exec(
     readFileSync(
       "supabase/migrations/202611270007_operations_health.sql",
+      "utf8",
+    ),
+  );
+  await db.exec(
+    readFileSync(
+      "supabase/migrations/202611270008_prisma_read_role.sql",
       "utf8",
     ),
   );
@@ -279,4 +286,55 @@ it("cannot retry a payment receipt after refund or against an unpaid order", asy
   await expect(
     db.query("select retry_notification($1,$2)", [admin, n.rows[0].id]),
   ).rejects.toThrow(/paid order/);
+});
+
+it("Prisma describes every public SQL column with the actual type and nullability", async () => {
+  const actual = await db.query<SchemaColumn>(
+    "select table_name,column_name,data_type,is_nullable from information_schema.columns where table_schema='public'",
+  );
+  const ordered = actual.rows.sort((a, b) =>
+    (a.table_name + "." + a.column_name).localeCompare(
+      b.table_name + "." + b.column_name,
+    ),
+  );
+  expect(prismaColumns()).toEqual(ordered);
+});
+it("the Prisma role cannot bypass RLS or write ordered/customer data", async () => {
+  const role = await db.query(
+    "select rolsuper,rolbypassrls,rolcreatedb,rolcreaterole from pg_roles where rolname='moro_prisma'",
+  );
+  expect(role.rows).toEqual([
+    {
+      rolsuper: false,
+      rolbypassrls: false,
+      rolcreatedb: false,
+      rolcreaterole: false,
+    },
+  ]);
+  await db.exec("set role moro_prisma");
+  try {
+    await db.query("select set_config('request.jwt.claim.sub',$1,true)", [bob]);
+    // An explicit transaction keeps SET LOCAL claims and the read on one lease.
+    await db.exec("begin");
+    await db.query("select set_config('request.jwt.claim.sub',$1,true)", [bob]);
+    expect(
+      (await db.query("select id from orders where customer_id=$1", [alice]))
+        .rows,
+    ).toHaveLength(0);
+    await db.exec("rollback");
+    await db.exec("begin");
+    await db.query("select set_config('request.jwt.claim.sub',$1,true)", [
+      alice,
+    ]);
+    expect(
+      (await db.query("select id from orders where customer_id=$1", [alice]))
+        .rows.length,
+    ).toBeGreaterThan(0);
+    await db.exec("rollback");
+    await expect(
+      db.query("update profiles set role='admin' where id=$1", [alice]),
+    ).rejects.toThrow(/permission denied/);
+  } finally {
+    await db.exec("rollback;reset role");
+  }
 });

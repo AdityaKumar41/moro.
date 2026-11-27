@@ -19,8 +19,8 @@ jobs:
       matrix:
         node: [22, 24]
     env:
-      NEXT_TELEMETRY_DISABLED: '1'
-      COMMERCE_ENABLED: 'false'
+      NEXT_TELEMETRY_DISABLED: "1"
+      COMMERCE_ENABLED: "false"
       PAYMENTS_MODE: test
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -34,6 +34,8 @@ jobs:
         run: npm ci
       - name: Check public source release
         run: npm run check:release
+      - name: Validate Prisma schema
+        run: npm run db:validate
       - name: Typecheck
         run: npm run typecheck
       - name: Unit, database and render tests
