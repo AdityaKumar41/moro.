@@ -1,23 +1,33 @@
 # Acceptance coverage
 
+The required application workflows are implemented for the agreed India/INR/GST review configuration with Stripe test payments. Additional operational checks below are distinct from missing application features.
+
 Run the current suite rather than relying on historical test counts. Credential-free CI and isolated real-service acceptance are described in TESTING.md. Evidence containing customer information belongs outside the public repository.
 
-| Requirement | Evidence in source | Limit |
-| --- | --- | --- |
-| Session/role isolation | http, database/RLS and Google-auth tests; server actor gates | Staff MFA and broader independent security review remain |
-| Dynamic catalogue/instant quotes | catalogue schema, pricing/commerce tests and public smoke | Sample rates need merchant approval |
-| Discounts and tax arithmetic | integer-money threshold tests | No statutory tax classification approval |
-| Text/logo design within print area | geometry, image, print-preflight and command tests | Not a complete Canva-style editor |
-| Saved/reusable artwork | resource/history/save-queue tests and opt-in studio acceptance | Multi-tab conflict and full expiry/device acceptance remain |
-| Payment capture | signed event/session reconciliation and database replay/gate tests | CI does not charge Stripe; complete real test-mode hosted acceptance separately |
-| CSV and print files | 36 family/layout/orientation cases plus a 500-row distinct-output render regression and PGlite tests | Hosted maximum-volume capacity and physical press/cutting certification remain |
-| Proof version and customer approval | database stale-proof/payment/approval tests and pipeline smoke script | Automated tests cover PDF, PDF-compatible AI, SVG and PNG fidelity; physical output still needs operator acceptance |
-| Receipts and customer emails | PDF-generation/attachment/transport tests and authenticated service acceptance | SMTP at least once; domain/bounce/volume acceptance remains |
-| Customer workspace/reorders | project-status/resources and service checks | Broader responsive/screen-reader matrix remains |
-| Staff pipeline/downloads/reports | database gates and isolated service/pipeline checks | Operating roles, alerts and recovery drills remain |
-| Real-work gallery | Six independent real-object photographs, one per required product family, filterable with creator/source/licence credits | Inspiration, not a claim of Moro customer commissions |
-| CI/source delivery | GitHub workflow, lockfile, release guard, license and documentation | Passing CI is not manufacturing/enterprise certification |
+| Requirement                         | Evidence in source                                                                                                              | Additional launch validation                                                                                        |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Session/role isolation              | http, database/RLS and Google-auth tests; server actor gates                                                                    | Staff MFA and broader independent security review remain                                                            |
+| Dynamic catalogue/instant quotes    | catalogue schema, pricing/commerce tests and public smoke                                                                       | Sample rates need merchant approval                                                                                 |
+| Discounts and tax arithmetic        | integer-money threshold tests                                                                                                   | No statutory tax classification approval                                                                            |
+| Text/logo design within print area  | geometry, image, print-preflight and command tests                                                                              | Not a complete Canva-style editor                                                                                   |
+| Saved/reusable artwork              | resource/history/save-queue tests and opt-in studio acceptance                                                                  | Multi-tab conflict and full expiry/device acceptance remain                                                         |
+| Payment capture                     | signed event/session reconciliation and database replay/gate tests                                                              | CI does not charge Stripe; complete real test-mode hosted acceptance separately                                     |
+| CSV and print files                 | 36 family/layout/orientation cases, offline 500-row regression, hosted 500-row proof/1,000-artifact acceptance and PGlite tests | One hosted 500-row batch verified; broader concurrent capacity and physical press/cutting certification remain      |
+| Proof version and customer approval | database stale-proof/payment/approval tests and pipeline smoke script                                                           | Automated tests cover PDF, PDF-compatible AI, SVG and PNG fidelity; physical output still needs operator acceptance |
+| Receipts and customer emails        | PDF-generation/attachment/transport tests and authenticated service acceptance                                                  | SMTP at least once; domain/bounce/volume acceptance remains                                                         |
+| Customer workspace/reorders         | project-status/resources and service checks                                                                                     | Broader responsive/screen-reader matrix remains                                                                     |
+| Staff pipeline/downloads/reports    | database gates and isolated service/pipeline checks                                                                             | Operating roles, alerts and recovery drills remain                                                                  |
+| Real-work gallery                   | Six independent real-object photographs, one per required product family, filterable with creator/source/licence credits        | Inspiration, not a claim of Moro customer commissions                                                               |
+| CI/source delivery                  | GitHub workflow, lockfile, release guard, license and documentation                                                             | Passing CI is not manufacturing/enterprise certification                                                            |
 
 Private checks have exercised hosted test payment/3DS, signed webhook updates, inbox delivery with PDF, saved-image/project reopening, proof revision/approval and email confirmation/recovery. The source release intentionally contains no account credentials, actual customer order IDs, exported receipts or deployed database records. Reproduce against your isolated project rather than treating those private checks as reusable fixtures.
 
 The supplied PRD is retained privately as input context. Owner-approved variations include the Moro name, India/INR/GST configuration, the authorized hosting account and test-only payments. Requirements involving real tax identity, physical press/cutting output, enterprise infrastructure cannot be signed off by inventing data or relabelling a review deployment.
+
+## Deployed acceptance record
+
+On 27 November 2026, isolated checks against the public deployment passed automatic source preparation for PDF, PDF-compatible AI, static SVG and PNG; owned order capture; automatic proofs and approved PDF/PNG output; forged/cross-owner source denial; full-archive filtering beyond 200 orders; and saved-design retrieval beyond 100 designs. Browser checks at desktop and 390-pixel mobile widths confirmed the uploaded PDF on the canvas. Desktop checks additionally confirmed account saving, project reopening, Delete/Undo and source-readiness recovery.
+
+The hosted batch check completed 500 personalized proof previews and 1,000 current production artifacts (500 PDFs and 500 PNGs), verified 500 distinct personalized PNG hashes, checked representative DPI/trim/bleed geometry, and enforced approval/customer/admin download boundaries. Payment and approval used named synthetic integration fixtures; this batch check is not a Stripe charge. Targeted worker requests process one resumable five-row batch, while the regular scheduled worker continues independently. All acceptance records and objects created by these checks were removed. Broader concurrent-job capacity is not inferred from one completed batch.
+
+The release suite has 121 tests across 30 files. Linux Node 22/24 build/smoke checks, dependency audit, secret scanning and CodeQL passed. Connected checks additionally verified restricted Prisma TLS/RLS and pooled identity isolation. No service credentials or private acceptance records are included in this source release.
