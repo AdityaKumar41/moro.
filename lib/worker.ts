@@ -174,7 +174,10 @@ export async function sendNotifications(notificationId?: string) {
         idempotencyKey: "notification/" + n.id,
       });
       checked(
-        await db.from("notifications").update({ state: "sent" }).eq("id", n.id),
+        await db
+          .from("notifications")
+          .update({ state: "sent", locked_until: null })
+          .eq("id", n.id),
       );
       sent++;
     } catch {

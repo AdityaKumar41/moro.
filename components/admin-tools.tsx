@@ -1,17 +1,9 @@
 "use client";
+import { requestJson as post } from "@/lib/client-request";
+import { queueAge, type OperationsHealth } from "@/lib/operations";
 import { useEffect, useState } from "react";
 import { useCatalog } from "./catalog-provider";
 import { defaultConfig, type Product } from "@/lib/catalog";
-async function post(path: string, body: unknown) {
-  const r = await fetch(path, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  const d = await r.json();
-  if (!r.ok) throw Error(d.error);
-  return d;
-}
 type Staff = { id: string; name: string; company: string; role: string };
 type Job = {
   id: string;
@@ -26,6 +18,8 @@ export function AdminTools() {
   const [tab, setTab] = useState("products");
   const [users, setUsers] = useState<Staff[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
+  const [health, setHealth] = useState<OperationsHealth>();
+  const [refreshing, setRefreshing] = useState(false);
   const [templates, setTemplates] = useState<
     { id: string; name: string; product_id: string }[]
   >([]);
@@ -33,15 +27,19 @@ export function AdminTools() {
   const [current, setCurrent] = useState<Product>(catalogue[0]);
   const [busy, setBusy] = useState(false);
   async function refresh() {
+    setRefreshing(true);
     try {
-      const r = await fetch("/api/admin");
-      const d = await r.json();
-      if (!r.ok) throw Error(d.error);
+      const d = await post("/api/admin");
       setUsers(d.profiles);
       setJobs(d.jobs);
       setTemplates(d.templates);
+      setHealth(d.health);
+      return true;
     } catch (e) {
       setMessage((e as Error).message);
+      return false;
+    } finally {
+      setRefreshing(false);
     }
   }
   useEffect(() => {
@@ -51,8 +49,12 @@ export function AdminTools() {
     setBusy(true);
     try {
       await post("/api/admin", body);
-      await refresh();
-      setMessage("Updated successfully.");
+      const refreshed = await refresh();
+      setMessage(
+        refreshed
+          ? "Updated successfully."
+          : "The update was saved. Refresh to see the latest state.",
+      );
     } catch (e) {
       setMessage((e as Error).message);
     } finally {
@@ -63,11 +65,18 @@ export function AdminTools() {
     <>
       <h2 className="panel-title">Behind the good work.</h2>
       <div className="tabs">
-        {["products", "users", "templates", "render jobs"].map((t) => (
+        {[
+          "products",
+          "users",
+          "templates",
+          "render jobs",
+          "service health",
+        ].map((t) => (
           <button
             key={t}
             className={tab === t ? "selected" : ""}
             onClick={() => setTab(t)}
+            aria-pressed={tab === t}
           >
             {t}
           </button>
@@ -403,6 +412,136 @@ export function AdminTools() {
             </article>
           ))}
         </>
+      ) : tab === "service health" ? (
+        <section aria-label="Service health" aria-busy={refreshing}>
+          <div className="ops-health-heading">
+            <div>
+              <h3>Keep the good work moving.</h3>
+              <p className="editor-caption">
+                Queue totals and the 50 most recent emails. Failed deliveries
+                need attention; queued work is picked up by the worker.
+              </p>
+            </div>
+            <button
+              className="button outline small"
+              disabled={refreshing || busy}
+              onClick={() => void refresh()}
+            >
+              {refreshing ? "Refreshing…" : "Refresh health"}
+            </button>
+          </div>
+          {!health ? (
+            <p role="status">
+              {refreshing
+                ? "Loading service health…"
+                : "Health is unavailable. Refresh to try again."}
+            </p>
+          ) : (
+            <>
+              <p className="editor-caption">
+                Checked {new Date(health.checkedAt).toLocaleString("en-IN")}.
+                Counts are a snapshot.
+              </p>
+              {(
+                [
+                  ["Artwork", health.jobs],
+                  ["Email", health.emails],
+                ] as const
+              ).map(([title, queue]) => (
+                <section
+                  key={title}
+                  className="ops-queue"
+                  aria-label={`${title} queue`}
+                >
+                  <h4>{title}</h4>
+                  <dl className="ops-health-grid">
+                    {(
+                      [
+                        ["Queued", queue.queued],
+                        ["In progress", queue.active],
+                        ["Failed", queue.failed],
+                        ["Expired leases", queue.expired],
+                      ] as const
+                    ).map(([label, count]) => (
+                      <div
+                        key={label}
+                        className={
+                          label === "Failed" && count > 0 ? "ops-attention" : ""
+                        }
+                      >
+                        <dt>{label}</dt>
+                        <dd>{count}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                  <p className="editor-caption">
+                    Oldest queued:{" "}
+                    {queueAge(
+                      queue.oldestQueuedAt,
+                      Date.parse(health.checkedAt),
+                    )}
+                    . Expired leases are eligible for worker recovery.
+                  </p>
+                </section>
+              ))}
+              <h4>Email delivery</h4>
+              <p className="editor-caption">
+                Sent means the provider accepted the message. Inbox placement is
+                verified separately. Before retrying a failed delivery, resolve
+                the sender or recipient issue.
+              </p>
+              {health.deliveries.length === 0 ? (
+                <p>No email deliveries yet.</p>
+              ) : (
+                <div className="ops-delivery-list">
+                  {health.deliveries.map((n) => (
+                    <article className="saved-card" key={n.id}>
+                      <div className="ops-delivery-title">
+                        <h5>
+                          DH-{n.order_number} · {n.kind.replaceAll("_", " ")}
+                        </h5>
+                        <span className="badge">{n.state}</span>
+                      </div>
+                      <p className="editor-caption">
+                        {n.attempts} delivery attempt
+                        {n.attempts === 1 ? "" : "s"} ·{" "}
+                        {new Date(n.created_at).toLocaleString("en-IN")}
+                      </p>
+                      {n.state === "failed" && (
+                        <button
+                          className="button outline small"
+                          disabled={busy || refreshing}
+                          onClick={async () => {
+                            setBusy(true);
+                            setMessage("Queuing this delivery…");
+                            try {
+                              await post("/api/admin", {
+                                action: "retry-email",
+                                id: n.id,
+                              });
+                              const refreshed = await refresh();
+                              setMessage(
+                                refreshed
+                                  ? "Delivery queued. The worker will retry this message."
+                                  : "Delivery queued. Refresh to see its latest state.",
+                              );
+                            } catch (e) {
+                              setMessage((e as Error).message);
+                            } finally {
+                              setBusy(false);
+                            }
+                          }}
+                        >
+                          {busy ? "Working…" : "Retry delivery"}
+                        </button>
+                      )}
+                    </article>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </section>
       ) : (
         <>
           <p className="editor-caption">

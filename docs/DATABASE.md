@@ -21,3 +21,5 @@ RLS applies to customer tables; privileged mutations are restricted to server/se
 The artwork, proofs and production storage buckets are private. The server authorizes each download and issues short-lived signed links. Source upload paths must be owned by the current customer. Current output artifacts are selected against the approved proof, not simply the newest storage file.
 
 Backup planning must include the database, authentication identities and storage objects. A schema migration alone cannot restore customer artwork or sender/payment settings. See OPERATIONS.md for restore acceptance and incident responsibilities.
+
+The operations-health migration adds queue indexes plus service-role-only `operations_health` and `retry_notification` functions. Both validate the administrator actor; email retries lock failed rows, reset bounded attempts and write an audit event. Apply before the corresponding application revision.

@@ -2568,3 +2568,25 @@
 .modal-title-row > button:hover {
   background: #e8e2d7;
 }
+
+.ops-health-heading,
+.ops-delivery-title {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.ops-health-heading h3 { margin: 0; font-size: 24px; letter-spacing: -.6px; }
+.ops-queue { padding: 18px 0; border-bottom: 1px solid var(--line, #ded9cd); }
+.ops-queue h4 { margin: 0 0 12px; font-size: 16px; }
+.ops-health-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 12px; margin: 0; }
+.ops-health-grid > div { background: #fffaf1; border: 1px solid #ded9cd; border-radius: 12px; padding: 16px; }
+.ops-health-grid dt { color: #626358; font-size: 12px; }
+.ops-health-grid dd { margin: 8px 0 0; font-size: 30px; line-height: 1; }
+.ops-health-grid .ops-attention { border-color: #c65235; }
+.ops-delivery-list { display: grid; gap: 12px; margin-top: 16px; }
+.ops-delivery-title h5 { margin: 0; font-size: 15px; overflow-wrap: anywhere; }
+@media (max-width: 640px) {
+  .ops-health-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .ops-health-heading { flex-direction: column; }
+}
