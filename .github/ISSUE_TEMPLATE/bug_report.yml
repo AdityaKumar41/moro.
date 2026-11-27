@@ -1,0 +1,27 @@
+name: Bug report
+description: Report a reproducible product issue without private customer data.
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Include the affected page, expected behavior and what happened instead. Redact personal data and credentials.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Commit and browser/device
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy
+      options:
+        - label: This report contains no credentials, payment details or private customer artwork.
+          required: true
