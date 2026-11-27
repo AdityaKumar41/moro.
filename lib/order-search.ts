@@ -26,7 +26,7 @@ export function orderSearch(params: URLSearchParams) {
     .replace(/[^\p{L}\p{N}\s@.+_-]/gu, " ")
     .replace(/\s+/g, " ")
     .trim()
-    .replace(/_/g, "\\_");
+    .replace(/[\\%_]/g, (character) => "\\" + character);
   const conditions = term
     ? [`shipping->>name.ilike.%${term}%`, `shipping->>email.ilike.%${term}%`]
     : [];

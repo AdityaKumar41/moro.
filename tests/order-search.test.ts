@@ -25,6 +25,9 @@ it("cannot inject PostgREST OR operators or wildcard searches through user text"
   expect(f.or).not.toContain("),");
   expect(f.or).not.toContain("(");
   expect(f.or?.split(",")).toHaveLength(2);
+  expect(
+    orderSearch(new URLSearchParams({ search: "name_with_underscore" })).or,
+  ).toContain("name\\_with\\_underscore");
   expect(() =>
     orderSearch(new URLSearchParams({ date: "2026-02-30" })),
   ).toThrow();
