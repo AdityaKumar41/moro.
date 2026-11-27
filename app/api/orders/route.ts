@@ -1,3 +1,6 @@
+import { preflightPrintImages } from "@/lib/image-preflight";
+import { orderSearch } from "@/lib/order-search";
+import { verifyPreparedSource } from "@/lib/source-artwork";
 import { saveDesignForOwner } from "@/lib/design-store";
 import { readyArtifacts } from "@/lib/production-files";
 import { printProfileSchema } from "@/lib/catalog";
@@ -36,8 +39,15 @@ export async function GET(req: Request) {
       .from("orders")
       .select("*,proofs!proofs_order_id_fkey(*),artifacts(*)")
       .order("created_at", { ascending: false })
+      .order("id", { ascending: false })
       .range(offset, offset + 199);
     if (profile?.role !== "admin") q = q.eq("customer_id", u.id);
+    const filters = orderSearch(new URL(req.url).searchParams);
+    if (filters.status) q = q.eq("status", filters.status);
+    if (filters.family) q = q.eq("configuration->>productId", filters.family);
+    if (filters.from) q = q.gte("created_at", filters.from);
+    if (filters.until) q = q.lt("created_at", filters.until);
+    if (filters.or) q = q.or(filters.or);
     const orders = checked(await q).data ?? [];
     if (profile?.role !== "admin") return NextResponse.json(orders);
     const ids = orders.map((o) => o.approved_proof_id).filter(Boolean);
@@ -97,6 +107,13 @@ export async function POST(req: Request) {
         .info(body.uploadPath);
       if (error || !data) throw new HttpError(400, "Artwork upload not found");
     }
+    if (body.uploadPath && !verifyPreparedSource(body.artwork, body.uploadPath))
+      throw new HttpError(
+        400,
+        "Prepare your attached artwork in the studio before ordering. The source image must remain visible.",
+      );
+    if (body.artwork.source && body.artwork.source.path !== body.uploadPath)
+      throw new HttpError(400, "Source artwork does not match its attachment.");
     const product = await catalogueProduct(body.configuration.productId);
     const pricing = {
       ...price(body.configuration, policy, product),
@@ -118,6 +135,7 @@ export async function POST(req: Request) {
     if (existing) return NextResponse.json(existing);
     try {
       preflightPrintText(body.artwork, body.configuration, body.variableData);
+      await preflightPrintImages(body.artwork);
     } catch (e) {
       throw new HttpError(400, (e as Error).message);
     }

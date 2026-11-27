@@ -18,7 +18,7 @@ Payments intentionally use Stripe test mode. No real card or fulfilment is requi
 6. In a separate session, sign in as the review administrator and open the production workspace. Filter the order list, inspect artwork/configuration and readiness, advance eligible jobs and download current approved output. Review reports and service health. Customer-only approval and paid/current-proof download checks apply on the server.
 7. Return as the customer to view order history, reopen saved work and reorder with the current price. Sign out and confirm private customer/staff routes are inaccessible.
 
-The studio accepts JPEG/PNG/WebP layers and private finished source attachments. Supported server output is per-row PDF/PNG with physical dimensions, selected DPI and bleed. AI/SVG/PDF source artwork follows the staff proof/preflight path; it is not silently converted into an invented editable design.
+The studio accepts JPEG/PNG/WebP layers and private finished source attachments. Supported server output is per-row PDF/PNG with physical dimensions, selected DPI and bleed. Single-page PDF, PDF-compatible Illustrator, static self-contained SVG and PNG artwork are prepared server-side and placed on the canvas automatically. The exact prepared image is carried into proofs and production. Legacy PostScript AI, encrypted/multi-page PDFs and unsafe SVG resources are rejected before payment with export guidance.
 
 ## Reproducible engineering checks
 

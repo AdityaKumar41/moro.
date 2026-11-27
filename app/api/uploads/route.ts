@@ -40,7 +40,7 @@ export async function POST(req: Request) {
       path,
       signedUrl: data.signedUrl,
       contentType: types[ext],
-      preflightRequired: true,
+      preparationRequired: true,
     });
   } catch (e) {
     return fail(e);

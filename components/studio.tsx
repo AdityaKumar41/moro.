@@ -628,8 +628,63 @@ export default function Studio() {
     setSelected(l.id);
     setTab("edit");
   }
-  const imageContext = useRef({ artwork, configuration, variableData });
-  imageContext.current = { artwork, configuration, variableData };
+  const imageContext = useRef({
+    artwork,
+    configuration,
+    variableData,
+    uploadPath,
+    uploadName,
+  });
+  imageContext.current = {
+    artwork,
+    configuration,
+    variableData,
+    uploadPath,
+    uploadName,
+  };
+  const [sourceReady, setSourceReady] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    setSourceReady(false);
+    if (artwork.source && artwork.source.path === uploadPath) {
+      const expected = artwork.source.imageHash;
+      void Promise.all(
+        artwork.layers
+          .filter((l) => l.kind === "image" && !l.hidden && l.image)
+          .map(async (l) => {
+            const digest = await crypto.subtle.digest(
+              "SHA-256",
+              new TextEncoder().encode(l.image!),
+            );
+            return (
+              Array.from(new Uint8Array(digest), (b) =>
+                b.toString(16).padStart(2, "0"),
+              ).join("") === expected
+            );
+          }),
+      )
+        .then((matches) => {
+          if (!cancelled) setSourceReady(matches.some(Boolean));
+        })
+        .catch(() => {});
+    }
+    return () => {
+      cancelled = true;
+    };
+  }, [artwork, uploadPath]);
+  function assertImportContext(context: typeof imageContext.current) {
+    const current = imageContext.current;
+    if (
+      Object.keys(context).some(
+        (key) =>
+          current[key as keyof typeof current] !==
+          context[key as keyof typeof context],
+      )
+    )
+      throw Error(
+        "Your design changed while the artwork opened. Please prepare the file again.",
+      );
+  }
   async function logo(file?: File) {
     const replacement = replaceImage.current;
     replaceImage.current = null;
@@ -745,8 +800,9 @@ export default function Studio() {
   }
   async function upload(file?: File) {
     if (!file || operation.current || !requireAccount("upload")) return;
+    const context = imageContext.current;
     operation.current = true;
-    setActivity("Uploading your source artwork…");
+    setActivity("Uploading and preparing your artwork…");
     setPending(true);
     try {
       if (file.size > 20971520) throw Error("Choose artwork up to 20 MB.");
@@ -772,11 +828,21 @@ export default function Studio() {
         body: file,
       });
       if (!uploaded.ok) throw Error("Artwork upload failed. Please try again.");
+      setActivity("Preparing your file for the canvas…");
+      const result = await api("/api/uploads/prepare", {
+        path: b.path,
+        name: file.name,
+        configuration,
+      });
+      const imported = designSchema.parse(result.artwork);
+      assertImportContext(context);
       remember();
+      setArtwork({ ...imported, name: artwork.name });
+      setSelected(imported.layers[0].id);
       setUploadPath(b.path);
       setUploadName(file.name);
       setMessage(
-        "Artwork attached. Our production team will preflight it and publish a proof before printing.",
+        "Artwork ready. Your file is on the canvas and will be used for your proof.",
       );
     } catch (e) {
       setMessage((e as Error).message);
@@ -1246,8 +1312,9 @@ export default function Studio() {
             <>
               <h2>Uploads & data</h2>
               <p className="editor-caption">
-                Add an image to your canvas, attach source artwork for
-                preflight, or personalise every piece with a CSV.
+                Import your finished artwork onto the canvas, add an image, or
+                personalise every piece with a CSV. PDF, PDF-compatible AI,
+                self-contained SVG and PNG are prepared automatically.
               </p>
               <button
                 className="button outline full"
@@ -1275,13 +1342,50 @@ export default function Studio() {
               </label>
               {uploadName && (
                 <p className="editor-caption">
-                  Attached: {uploadName}{" "}
+                  {sourceReady ? "Ready:" : "Attached:"} {uploadName}{" "}
+                  {!sourceReady && (
+                    <button
+                      className="text-link"
+                      disabled={pending}
+                      onClick={async () => {
+                        if (!uploadPath || operation.current) return;
+                        const context = imageContext.current;
+                        operation.current = true;
+                        setPending(true);
+                        setActivity("Preparing attached artwork…");
+                        try {
+                          const result = await api("/api/uploads/prepare", {
+                            path: uploadPath,
+                            name: uploadName,
+                            configuration,
+                          });
+                          const imported = designSchema.parse(result.artwork);
+                          assertImportContext(context);
+                          remember();
+                          setArtwork({ ...imported, name: artwork.name });
+                          setSelected(imported.layers[0].id);
+                          setMessage(
+                            "Your source artwork is ready on the canvas.",
+                          );
+                        } catch (e) {
+                          setMessage((e as Error).message);
+                        } finally {
+                          operation.current = false;
+                          setPending(false);
+                          setActivity("");
+                        }
+                      }}
+                    >
+                      Prepare artwork
+                    </button>
+                  )}
                   <button
                     className="text-link"
                     onClick={() => {
                       remember();
                       setUploadPath(undefined);
                       setUploadName("");
+                      setArtwork(({ source: _source, ...current }) => current);
                     }}
                   >
                     Remove

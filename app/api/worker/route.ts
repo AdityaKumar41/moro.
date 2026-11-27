@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { NextResponse } from "next/server";
 import { actor, fail, limit, sameOrigin } from "@/lib/http";
 import { drainQueue } from "@/lib/worker";
@@ -24,7 +25,12 @@ export async function GET(req: Request) {
   )
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
-    return NextResponse.json({ batches: await drainQueue() });
+    const target = new URL(req.url).searchParams.get("order");
+    const orderId = target === null ? undefined : z.uuid().parse(target);
+    return NextResponse.json({
+      batches: await drainQueue(45000, orderId),
+      orderId: orderId ?? null,
+    });
   } catch (e) {
     return fail(e);
   }

@@ -47,6 +47,12 @@ beforeAll(async () => {
       "utf8",
     ),
   );
+  await db.exec(
+    readFileSync(
+      "supabase/migrations/202611270009_source_preparation.sql",
+      "utf8",
+    ),
+  );
   await db.query(`insert into auth.users(id) values($1),($2),($3)`, [
     alice,
     bob,
@@ -337,4 +343,38 @@ it("the Prisma role cannot bypass RLS or write ordered/customer data", async () 
   } finally {
     await db.exec("rollback;reset role");
   }
+});
+
+it("prepared source uploads queue their actual proof automatically; legacy attachments cannot silently render a starter", async () => {
+  for (const prepared of [false, true]) {
+    const path = alice + "/original.pdf",
+      artwork = prepared
+        ? { source: { version: 1, path }, layers: [] }
+        : { layers: [] };
+    const result = await db.query<{ id: string }>(
+      `insert into orders(customer_id,request_key,configuration,artwork,upload_path,pricing,total,currency,shipping,checkout_id) values($1,gen_random_uuid(),'{}',$2,$3,'{}',100,'INR','{}','source_checkout') returning id`,
+      [alice, JSON.stringify(artwork), path],
+    );
+    const id = result.rows[0].id;
+    await db.query(
+      "select apply_payment($1,$2,'source_payment',100,'INR','source_checkout','paid')",
+      ["source_event_" + id, id],
+    );
+    const proofs = await db.query("select id from proofs where order_id=$1", [
+      id,
+    ]);
+    expect(proofs.rows).toHaveLength(prepared ? 1 : 0);
+    if (prepared) {
+      const claimed = await db.query<{ order_id: string }>(
+        "select * from claim_order_job($1)",
+        [id],
+      );
+      expect(claimed.rows[0].order_id).toBe(id);
+    }
+  }
+  await asCustomer(bob, async () => {
+    await expect(
+      db.query("select * from claim_order_job($1)", [order]),
+    ).rejects.toThrow(/permission denied/);
+  });
 });

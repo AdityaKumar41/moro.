@@ -5,14 +5,22 @@ import { NextResponse } from "next/server";
 import { actor, checked, fail, jsonBody, limit, sameOrigin } from "@/lib/http";
 import { adminDb } from "@/lib/db";
 import { designSchema } from "@/lib/catalog";
-export async function GET() {
+export async function GET(req: Request) {
   try {
     const u = await actor();
+    const offset = Math.max(
+      0,
+      Math.min(
+        1000000,
+        Number(new URL(req.url).searchParams.get("offset")) || 0,
+      ),
+    );
     const rows = prismaConfigured()
       ? await withPrismaSession(u.id, (db) =>
           db.design.findMany({
             where: { customer_id: u.id },
-            orderBy: { created_at: "desc" },
+            orderBy: [{ created_at: "desc" }, { id: "desc" }],
+            skip: offset,
             take: 100,
           }),
         )
@@ -22,7 +30,8 @@ export async function GET() {
             .select("*")
             .eq("customer_id", u.id)
             .order("created_at", { ascending: false })
-            .limit(100),
+            .order("id", { ascending: false })
+            .range(offset, offset + 99),
         ).data ?? []);
     return NextResponse.json(
       rows.map((row) => ({

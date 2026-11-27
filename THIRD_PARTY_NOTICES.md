@@ -24,3 +24,10 @@ These photographs show independent work, not Moro commissions or endorsements. E
 | laser.webp | Lightwave / Lightwave Laser | [Laser cut wood detail](https://commons.wikimedia.org/wiki/File:Laser_cut_wood_detail.jpg) | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/) |
 
 The source-file descriptions and licences were checked on 27 November 2026. UI attribution is driven by `lib/gallery.ts`. The app's MIT licence does not replace any of these asset licences.
+
+## Automatic source-artwork rendering
+
+- `@hyzyla/pdfium` wraps PDFium for PDF/PDF-compatible Illustrator rendering. Retained wrapper MIT notice: `docs/licenses/PDFium-wrapper-MIT.txt`. Upstream PDFium and its components retain their licences; see the retained `docs/licenses/PDFium-third-party.txt` and https://pdfium.googlesource.com/pdfium/+/main/LICENSE.
+- `@resvg/resvg-js` is MPL-2.0; retained licence: `docs/licenses/Resvg-MPL-2.0.txt`. The unmodified renderer is used as a dependency; its upstream source is https://github.com/thx/resvg-js.
+- `@xmldom/xmldom` is MIT; retained notice: `docs/licenses/Xmldom-MIT.txt`.
+- The additional Arimo, Tinos and Cousine TTF files are lossless container conversions of the corresponding Fontsource WOFF files. They retain the original SIL Open Font Licences already stored with the fonts. No glyphs or family names were changed.

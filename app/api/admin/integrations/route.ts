@@ -41,6 +41,11 @@ export async function GET() {
     }
     return NextResponse.json({
       payments,
+      capabilities: {
+        automaticSourceArtwork: true,
+        targetedWorker: true,
+        archiveSearch: true,
+      },
       email: {
         configured: mailConfigured(),
         provider: process.env.SMTP_HOST

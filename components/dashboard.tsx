@@ -1,4 +1,5 @@
 "use client";
+import { orderSearchUrl } from "@/lib/order-search";
 import { TestPaymentGuide } from "./test-payment-guide";
 import {
   CHECKOUT_RETURN_KEY,
@@ -95,6 +96,10 @@ export default function Dashboard({ admin = false }: { admin?: boolean }) {
   const [profile, setProfile] = useState<Profile>();
   const [orders, setOrders] = useState<Order[]>([]);
   const [hasMore, setHasMore] = useState(false);
+  const [matchingOrders, setMatchingOrders] = useState<Order[] | null>(null);
+  const [matchingHasMore, setMatchingHasMore] = useState(false);
+  const [searchingOrders, setSearchingOrders] = useState(false);
+  const [searchRefresh, setSearchRefresh] = useState(0);
   const [report, setReport] = useState<{
     orders: number;
     revenue: number;
@@ -102,6 +107,7 @@ export default function Dashboard({ admin = false }: { admin?: boolean }) {
     throughput: Record<string, number>;
   }>();
   const [designs, setDesigns] = useState<Design[]>([]);
+  const [moreDesigns, setMoreDesigns] = useState(false);
   const [tab, setTab] = useState(admin ? "orders" : "overview");
   const [loadError, setLoadError] = useState("");
   const [projectSearch, setProjectSearch] = useState("");
@@ -148,6 +154,9 @@ export default function Dashboard({ admin = false }: { admin?: boolean }) {
   const [status, setStatus] = useState("all");
   const [family, setFamily] = useState("all");
   const [date, setDate] = useState("");
+  const activeOrderQuery = orderSearchUrl({ search, status, family, date });
+  const activeOrderQueryRef = useRef(activeOrderQuery);
+  activeOrderQueryRef.current = activeOrderQuery;
   const [proofReadyKey, setProofReadyKey] = useState("");
   const [proofView, setProofView] = useState<{
     order: Order;
@@ -167,8 +176,12 @@ export default function Dashboard({ admin = false }: { admin?: boolean }) {
       setProfile(p);
       setOrders(rows);
       setHasMore(rows.length === 200);
+      setSearchRefresh((v) => v + 1);
       if (admin) setReport(extra);
-      else setDesigns(extra);
+      else {
+        setDesigns(extra);
+        setMoreDesigns(extra.length === 100);
+      }
       setMessage("");
     } catch (e) {
       setLoadError((e as Error).message);
@@ -179,6 +192,35 @@ export default function Dashboard({ admin = false }: { admin?: boolean }) {
   useEffect(() => {
     void load();
   }, []); // Refresh is explicit; live payment confirmation is never inferred from redirects.
+  useEffect(() => {
+    if (loading) return;
+    if (!search.trim() && status === "all" && family === "all" && !date) {
+      setMatchingOrders(null);
+      setSearchingOrders(false);
+      return;
+    }
+    let cancelled = false;
+    setSearchingOrders(true);
+    const timer = setTimeout(() => {
+      void request(orderSearchUrl({ search, status, family, date }))
+        .then((rows) => {
+          if (!cancelled) {
+            setMatchingOrders(rows);
+            setMatchingHasMore(rows.length === 200);
+          }
+        })
+        .catch((e) => {
+          if (!cancelled) setMessage((e as Error).message);
+        })
+        .finally(() => {
+          if (!cancelled) setSearchingOrders(false);
+        });
+    }, 250);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [loading, search, status, family, date, searchRefresh]);
   const returnedOrder = orders.find((o) => o.id === paymentReturn.orderId);
   useEffect(() => {
     if (
@@ -344,15 +386,17 @@ export default function Dashboard({ admin = false }: { admin?: boolean }) {
     a.click();
     URL.revokeObjectURL(a.href);
   }
-  const filtered = orders.filter(
-    (o) =>
-      (status === "all" || o.status === status) &&
-      (family === "all" || o.configuration.productId === family) &&
-      (!date || businessDate(o.created_at) === date) &&
-      `DH-${o.number} ${o.id} ${o.customer_id} ${o.shipping?.name} ${o.shipping?.email}`
-        .toLowerCase()
-        .includes(search.toLowerCase()),
-  );
+  const filtered =
+    matchingOrders ??
+    orders.filter(
+      (o) =>
+        (status === "all" || o.status === status) &&
+        (family === "all" || o.configuration.productId === family) &&
+        (!date || businessDate(o.created_at) === date) &&
+        `DH-${o.number} ${o.id} ${o.customer_id} ${o.shipping?.name} ${o.shipping?.email}`
+          .toLowerCase()
+          .includes(search.toLowerCase()),
+    );
   const awaitingProofs = orders.filter(needsProofApproval);
   const matchingDesigns = designs.filter((d) =>
     (
@@ -733,6 +777,29 @@ export default function Dashboard({ admin = false }: { admin?: boolean }) {
                 </label>
               </div>
               {projectCards(matchingDesigns)}
+              {moreDesigns && (
+                <button
+                  className="button outline"
+                  disabled={!!busy}
+                  onClick={async () => {
+                    setBusy("more-designs");
+                    setBusyLabel("Loading earlier designs…");
+                    try {
+                      const rows = await request(
+                        "/api/designs?offset=" + designs.length,
+                      );
+                      setDesigns((current) => [...current, ...rows]);
+                      setMoreDesigns(rows.length === 100);
+                    } catch (e) {
+                      setMessage((e as Error).message);
+                    } finally {
+                      setBusy("");
+                    }
+                  }}
+                >
+                  Load earlier designs
+                </button>
+              )}
               {designs.length > 0 && !matchingDesigns.length && (
                 <div className="empty-state">
                   <h3>No designs found.</h3>
@@ -902,6 +969,11 @@ export default function Dashboard({ admin = false }: { admin?: boolean }) {
                   </>
                 )}
               </div>
+              {searchingOrders && (
+                <p role="status" className="editor-caption">
+                  Searching all orders…
+                </p>
+              )}
               {filtered
                 .filter((o) => tab !== "proofs" || needsProofApproval(o))
                 .map((o) => {
@@ -1177,18 +1249,28 @@ export default function Dashboard({ admin = false }: { admin?: boolean }) {
                     </article>
                   );
                 })}
-              {hasMore && (
+              {(matchingOrders !== null ? matchingHasMore : hasMore) && (
                 <button
                   className="button outline"
                   disabled={!!busy}
                   onClick={async () => {
+                    const issuedQuery = activeOrderQueryRef.current;
                     setBusy("more");
                     try {
                       const rows = await request(
-                        "/api/orders?offset=" + orders.length,
+                        orderSearchUrl(
+                          { search, status, family, date },
+                          (matchingOrders ?? orders).length,
+                        ),
                       );
-                      setOrders([...orders, ...rows]);
-                      setHasMore(rows.length === 200);
+                      if (issuedQuery !== activeOrderQueryRef.current) return;
+                      if (matchingOrders !== null) {
+                        setMatchingOrders([...matchingOrders, ...rows]);
+                        setMatchingHasMore(rows.length === 200);
+                      } else {
+                        setOrders([...orders, ...rows]);
+                        setHasMore(rows.length === 200);
+                      }
                     } catch (e) {
                       setMessage((e as Error).message);
                     } finally {

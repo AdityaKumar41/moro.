@@ -41,9 +41,26 @@ export function sameOrigin(req: Request) {
 export async function jsonBody(req: Request, max = 2100000) {
   if (Number(req.headers.get("content-length") || 0) > max)
     throw new HttpError(413, "Request is too large");
-  const text = await req.text();
-  if (Buffer.byteLength(text) > max)
-    throw new HttpError(413, "Request is too large");
+  const reader = req.body?.getReader();
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  if (reader) {
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        size += value.byteLength;
+        if (size > max) {
+          await reader.cancel();
+          throw new HttpError(413, "Request is too large");
+        }
+        chunks.push(value);
+      }
+    } finally {
+      reader.releaseLock();
+    }
+  }
+  const text = Buffer.concat(chunks).toString("utf8");
   try {
     return JSON.parse(text);
   } catch {

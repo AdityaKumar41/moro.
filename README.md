@@ -45,7 +45,7 @@ The public smoke check starts the production build on an ephemeral local port. U
 - Staff product/template/user management, order pipeline, reporting and operational tools.
 - Signed, reconciled, idempotent Stripe Checkout webhooks. Browser return URLs cannot mark an order paid.
 
-The editor is a print editor, not a full Canva replacement. Grouping, multiselection, rich multiline editing, crop tools and arbitrary vector source import are not currently claimed. Production PDFs contain raster RGB artwork, not certified PDF/X, CMYK separation or machine cutting paths.
+The editor is a print editor, not a full Canva replacement. Grouping, multiselection, rich multiline editing, crop tools and editable conversion of arbitrary vector internals are not currently claimed. Production PDFs contain raster RGB artwork, not certified PDF/X, CMYK separation or machine cutting paths.
 
 ## Configure services
 
